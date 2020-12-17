@@ -39,10 +39,10 @@
                 </table>
             </div>
             <div class="downside">
-                {% for genre in data-1 %}
+                {% for genre in data1 %}
                 <div class="genre">
                     <title>{{genre.genres}}</title>
-                    {% for review in data-2 %}
+                    {% for review in data2 %}
                     <div class="review">
                         <div class="right-box">
                             {{review.image}}
@@ -50,12 +50,13 @@
                         </div>
                         <div class="left-box">
                             <div class="account">
-                                {{review.user-pic}}
-                                {{review.user-name}}
-                                {{review.good-bad}}
+                                <img src="{{ review.userPic.url }}" width="100" height="100" />
+                                {{review.userName}}
+                                {{review.good}}
+                                {{review.bad}}
                             </div>
                             <div class="comment">
-                                {{review.comment-title}}
+                                {{review.commentTitle}}
                                 {{review.comment}}
                             </div>
                         </div>
