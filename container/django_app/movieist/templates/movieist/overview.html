@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{title}}</title>
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-title">
+            <h3>Movieist</h3>
+        </div>
+        <div class="header-list">
+            <ul>
+                <li>注目の映画</li>
+                <li>映画を探す</li>
+                <li>レビュアーランキング</li>
+                <li>レビューする</li>
+            </ul>
+        </div>
+        <div class="header-menu">
+            <img src="" alt="">
+        </div>
+    </div>
+    <div class="main">
+        <div class="container">
+            <div class="upside">
+                <title>映画概要></title>
+
+                <table>
+                    <form action="{% url 'overview' %}" method="post">
+                        {% csrf_token %}
+                        {{form}}
+                        <tr>
+                            <th></th>
+                            <td><input type="submit" value="click"></td>
+                        </tr>
+                    </form>
+                </table>
+            </div>
+            <div class="downside">
+                <div class="downside-pic">
+                    <img src={{image}}>
+                </div>
+                <div class="downside-contents">
+                    <h1>{{title}}</h1>
+                    <a href="">レビュー></a>
+                    <p>{{overview}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <div class="footer-container">
+            <div class="footer-title">
+                <h3>Movieist></h3>
+                <p>投稿者のおすすめから見つける映画情報サイト >>></p>
+            </div>
+            <div class="footer-sitemap">
+                <ul>
+                    <li>/homePage</li>
+                    <li>/search</li>
+                    <li>/reviewerRanking</li>
+                    <li>/overview</li>
+                </ul>
+                <ul>
+                    <li>/login</li>
+                    <li>/sign up</li>
+                    <li>/profile</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
