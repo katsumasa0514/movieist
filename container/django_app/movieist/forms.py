@@ -9,4 +9,4 @@ class FindForm(forms.Form):
 class DocumentForm(forms.ModelForm):
     class Meta:
         model = Search
-        fields = ('userPic')
+        fields = ('userPic',)

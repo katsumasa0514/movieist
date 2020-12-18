@@ -142,4 +142,3 @@ def overview(request):
 def search(request):
     if (request.method == 'POST'):
         msg = request.POST['find']
-        msgData =
