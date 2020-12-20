@@ -4,6 +4,7 @@ from .forms import FindForm
 import requests
 import json
 from pprint import pprint
+from .models import Search
 
 token = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4YjY5ZjBmMGE0NDBiYjc1NmEwMjE0MjEwYzZlZDZjMiIsInN1YiI6IjVmY2FlMWNlMzk0YTg3MDA0MWQ2MDBlNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Y4BNiKaz70SktudaUey9MOHMAbhW6dEqCMqFO8RKN9Y'
 
@@ -105,6 +106,10 @@ class TMDB:
         url = f'{self.base_url_}movie/upcoming'
         return self._json_by_get_request(url)
 
+    def get_genre_movies(self):
+        url = f'{self.base_url_}genre/movie/list?api_key=8b69f0f0a440bb756a0214210c6ed6c2&language=en'
+        return self._json_by_get_request(url)
+
 
 api = TMDB(token)
 
@@ -126,7 +131,7 @@ def overview(request):
         image = f"{api.img_base_url_}{image['posters'][0]['file_path']}"
 
         params = {
-            'title': res['results'][0]['original_title'],
+            'title': res['results'][0]['title'],
             'overview': res['results'][0]['overview'],
             'image': image,
             'form': FindForm(request.POST),
@@ -142,3 +147,19 @@ def overview(request):
 def search(request):
     if (request.method == 'POST'):
         msg = request.POST['find']
+        dataFind = Search.object.filter(title__icontains=msg).order_by('good')[
+            int(list[0]): int(list[10])]
+        form = FindForm(request.POST)
+
+    else:
+        genreList = api.get_genre_movies()
+        for i in genreList:
+            dataFind = Search.object.filter(genres=i['genres'][0]['name']).order_by('good')[
+                int(list[0]): int(list[3])]
+        form = FindForm()
+    params = {
+        'data': dataFind,
+        'form': form,
+    }
+
+    return render(request, 'movieist/search.html', params)

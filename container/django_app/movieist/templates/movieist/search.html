@@ -39,10 +39,9 @@
                 </table>
             </div>
             <div class="downside">
-                {% for genre in data1 %}
-                <div class="genre">
-                    <title>{{genre.genres}}</title>
-                    {% for review in data2 %}
+                {% for review in data %}
+                <div class="contents">
+                    <title>{{review.genre}}</title>
                     <div class="review">
                         <div class="right-box">
                             {{review.image}}
@@ -61,7 +60,6 @@
                             </div>
                         </div>
                     </div>
-                    {% endfor %}
                 </div>
                 {% endfor %}
             </div>
