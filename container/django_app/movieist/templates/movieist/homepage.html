@@ -17,6 +17,9 @@
                 <li>映画を探す</li>
                 <li>レビュアーランキング</li>
                 <li>レビューする</li>
+                {% load account %}
+
+                {% user_display user %}
             </ul>
         </div>
         <div class="header-menu">
@@ -44,5 +47,7 @@
         </div>
     </div>
 </body>
+{% block content %}
+{% endblock %}
 
 </html>
