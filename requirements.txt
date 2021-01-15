@@ -4,3 +4,5 @@ mysqlclient
 Pillow
 requests
 tmdbv3api
+allauth
+django-allauth

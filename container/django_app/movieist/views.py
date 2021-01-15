@@ -1,10 +1,14 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .forms import FindForm
+from .forms import ReviewForm
+from .models import Review
 import requests
 import json
 from pprint import pprint
-from .models import Search
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
+from django.contrib.auth.models import User
 
 token = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4YjY5ZjBmMGE0NDBiYjc1NmEwMjE0MjEwYzZlZDZjMiIsInN1YiI6IjVmY2FlMWNlMzk0YTg3MDA0MWQ2MDBlNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Y4BNiKaz70SktudaUey9MOHMAbhW6dEqCMqFO8RKN9Y'
 
@@ -27,7 +31,7 @@ class TMDB:
         return self._json_by_get_request(url, params)
 
     def get_movie(self, movie_id):
-        url = f'{self.base_url_}movie/{movie_id}?api_key=8b69f0f0a440bb756a0214210c6ed6c2&language=ja-JA&page=1&include_adult=false'
+        url = f'{self.base_url_}movie/{movie_id}?api_key=8b69f0f0a440bb756a0214210c6ed6c2&language=ja&page=1&include_adult=false'
         return self._json_by_get_request(url)
 
     def get_movie_account_states(self, movie_id):
@@ -51,7 +55,7 @@ class TMDB:
         return self._json_by_get_request(url)
 
     def get_movie_images(self, movie_id, language=None):
-        url = f'{self.base_url_}movie/{movie_id}/images?api_key=8b69f0f0a440bb756a0214210c6ed6c2&include_image_language=ja'
+        url = f'{self.base_url_}movie/{movie_id}/images?api_key=8b69f0f0a440bb756a0214210c6ed6c2&include_image_language=en'
         return self._json_by_get_request(url)
 
     def get_movie_keywords(self, movie_id):
@@ -121,25 +125,38 @@ def homepage(request):
     return render(request, 'movieist/homepage.html', params)
 
 
-def overview(request):
+def movieselect(request):
     if (request.method == 'POST'):
         msg = request.POST['find']
         res = api.search_movies(msg)
-
-        movie_id = res['results'][0]['id']
-        image = api.get_movie_images(movie_id)
-        image = f"{api.img_base_url_}{image['posters'][0]['file_path']}"
+        res = res['results']
 
         params = {
-            'title': res['results'][0]['title'],
-            'overview': res['results'][0]['overview'],
-            'image': image,
+            'res': res,
             'form': FindForm(request.POST),
         }
     else:
         params = {
             'form': FindForm(),
         }
+
+    return render(request, 'movieist/movieselect.html', params)
+
+
+def overview(request, movie_id):
+    res = api.get_movie(movie_id)
+    image = api.get_movie_images(movie_id)
+    image = f"{api.img_base_url_}{image['posters'][0]['file_path']}"
+    review = ("レビュー>")
+
+    params = {
+        'title': res['title'],
+        'overview': res['overview'],
+        'image': image,
+        'form': FindForm(request.POST),
+        'review': review,
+        'movie_id': movie_id,
+    }
 
     return render(request, 'movieist/overview.html', params)
 
@@ -163,3 +180,26 @@ def search(request):
     }
 
     return render(request, 'movieist/search.html', params)
+
+
+@login_required(login_url='/movieist/accounts/login/')
+def review(request, movie_id):
+    res = api.get_movie(movie_id)
+    title = res['title']
+
+    if (request.method == 'POST'):
+        obj = Review()
+        form = ReviewForm(request.POST, instance=obj)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.owner = request.user
+            review.movie_id = movie_id
+            review.save()
+        return redirect(to='/movieist/movieselect')
+    params = {
+        'form': ReviewForm(),
+        'title': title,
+        'movie': movie_id
+    }
+
+    return render(request, 'movieist/review.html', params)

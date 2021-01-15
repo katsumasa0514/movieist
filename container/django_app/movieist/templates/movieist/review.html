@@ -1,9 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ja">
 
 <head>
     <meta charset="UTF-8">
     <title>{{page_title}}</title>
+    <link rel="stylesheet" href="{% static 'hello/css/style.css' %}" type="text/css">
 </head>
 
 <body>
@@ -23,23 +25,23 @@
             <img src="" alt="">
         </div>
     </div>
+
     <div class="main">
         <div class="container">
-            <div class="upside">
-                <title>映画概要></title>
-            </div>
-            <div class="downside">
-                <div class="downside-pic">
-                    <img src={{image}}>
-                </div>
-                <div class="downside-contents">
-                    <h1>{{title}}</h1>
-                    <a href="review">{{review}}</a>
-                    <p>{{overview}}</p>
-                </div>
-            </div>
+            <h1>{{title}}</h1>
+            <table>
+                <form action="{% url 'review' movie %}" method="post">
+                    {% csrf_token %}
+                    {{form}}
+                    <tr>
+                        <td></td>
+                        <td><input type="submit" value="送信"></td>
+                    </tr>
+                </form>
+            </table>
         </div>
     </div>
+
     <div class="footer">
         <div class="footer-container">
             <div class="footer-title">
@@ -61,6 +63,7 @@
             </div>
         </div>
     </div>
+
 </body>
 
 </html>

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Search
+from .models import Profile, Review
 
 
 class FindForm(forms.Form):
@@ -8,5 +8,11 @@ class FindForm(forms.Form):
 
 class DocumentForm(forms.ModelForm):
     class Meta:
-        model = Search
-        fields = ('userPic',)
+        model = Profile
+        fields = ['userPic', ]
+
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['commentTitle', 'comment', ]
