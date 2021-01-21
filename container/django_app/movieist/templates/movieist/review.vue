@@ -5,7 +5,9 @@
 <head>
     <meta charset="UTF-8">
     <title>{{page_title}}</title>
-    <link rel="stylesheet" href="{% static 'hello/css/style.css' %}" type="text/css">
+    <link rel="stylesheet" type="text/css" href="{% static 'movieist/css/style.css' %}" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+    <script src="https://unpkg.com/vue-star-rating@1.7.0/dist/VueStarRating.umd.min.js"></script>
 </head>
 
 <body>
@@ -29,6 +31,10 @@
     <div class="main">
         <div class="container">
             <h1>{{title}}</h1>
+            <div id="app">
+                <h2>basic</h2>
+                <star-rating></star-rating>
+            </div>
             <table>
                 <form action="{% url 'review' movie %}" method="post">
                     {% csrf_token %}
@@ -63,7 +69,30 @@
             </div>
         </div>
     </div>
+    <script>
+        Vue.component('star-rating', VueStarRating.default)
 
+        new Vue({
+            el: '#app',
+            methods: {
+                setRating: function (rating) {
+                    this.rating = "You have Selected: " + rating + " stars";
+                },
+                showCurrentRating: function (rating) {
+                    this.currentRating = (rating === 0) ? this.currentSelectedRating : "Click to select " + rating + " stars"
+                },
+                setCurrentSelectedRating: function (rating) {
+                    this.currentSelectedRating = "You have Selected: " + rating + " stars";
+                }
+            },
+            data: {
+                rating: "No Rating Selected",
+                currentRating: "No Rating",
+                currentSelectedRating: "No Current Rating",
+                boundRating: 3,
+            }
+        });
+    </script>
 </body>
 
 </html>

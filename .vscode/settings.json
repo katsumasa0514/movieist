@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "/Users/nawakatsushou/.local/share/virtualenvs/my_app_Movieist-AKC486yy/bin/python"
+    "python.pythonPath": "/Users/nawakatsushou/.local/share/virtualenvs/my_app_Movieist-AKC486yy/bin/python",
+    "liveServer.settings.port": 5501
 }

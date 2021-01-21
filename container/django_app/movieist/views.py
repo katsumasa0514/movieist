@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from .forms import FindForm
 from .forms import ReviewForm
-from .models import Review
+from .models import Review, Profile, Follow
 import requests
 import json
 from pprint import pprint
@@ -125,6 +125,27 @@ def homepage(request):
     return render(request, 'movieist/homepage.html', params)
 
 
+def search(request):
+    if (request.method == 'POST'):
+        msg = request.POST['find']
+        dataFind = Search.object.filter(title__icontains=msg).order_by('good')[
+            int(list[0]): int(list[10])]
+        form = FindForm(request.POST)
+
+    else:
+        genreList = api.get_genre_movies()
+        for i in genreList:
+            dataFind = Search.object.filter(genres=i['genres'][0]['name']).order_by('good')[
+                int(list[0]): int(list[3])]
+        form = FindForm()
+    params = {
+        'data': dataFind,
+        'form': form,
+    }
+
+    return render(request, 'movieist/search.html', params)
+
+
 def movieselect(request):
     if (request.method == 'POST'):
         msg = request.POST['find']
@@ -161,27 +182,6 @@ def overview(request, movie_id):
     return render(request, 'movieist/overview.html', params)
 
 
-def search(request):
-    if (request.method == 'POST'):
-        msg = request.POST['find']
-        dataFind = Search.object.filter(title__icontains=msg).order_by('good')[
-            int(list[0]): int(list[10])]
-        form = FindForm(request.POST)
-
-    else:
-        genreList = api.get_genre_movies()
-        for i in genreList:
-            dataFind = Search.object.filter(genres=i['genres'][0]['name']).order_by('good')[
-                int(list[0]): int(list[3])]
-        form = FindForm()
-    params = {
-        'data': dataFind,
-        'form': form,
-    }
-
-    return render(request, 'movieist/search.html', params)
-
-
 @login_required(login_url='/movieist/accounts/login/')
 def review(request, movie_id):
     res = api.get_movie(movie_id)
@@ -202,4 +202,14 @@ def review(request, movie_id):
         'movie': movie_id
     }
 
-    return render(request, 'movieist/review.html', params)
+    return render(request, 'movieist/review.vue', params)
+
+
+@login_required(login_url='/movieist/accounts/login/')
+def profile(request):
+    reviewData = Review.objects.filter(owner=request.user.id)
+    params = {
+        'reviewData': reviewData,
+    }
+
+    return render(request, 'movieist/profile.html', params)

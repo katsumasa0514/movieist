@@ -1,4 +1,3 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="ja">
 
@@ -6,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{page_title}}</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'movieist/css/style.css' %}" />
 </head>
 
 <body>
@@ -26,39 +24,27 @@
             <img src="" alt="">
         </div>
     </div>
-
     <div class="main">
         <div class="container">
-            <title>レビューする></title>
-            <div class="select">
-                <div class="form">
-                    <table>
-                        <form action="{% url 'movieselect' %}" method="post">
-                            {% csrf_token %}
-                            {{form}}
-                            <tr>
-                                <th></th>
-                                <td><input type="submit" value="click"></td>
-                            </tr>
-                        </form>
-                    </table>
-                </div>
+            <div class="user">
+                <div class="user-upside">
 
-                <div class="result">
-                    <div class="result-container">
-                        <div class="movie-box">
-                            {% for i in res %}
-                            <img src=https://image.tmdb.org/t/p/w500{{i.poster_path}}>
-                            <a href="overview/{{i.id}}">{{i.title}}</a>
-                            {% endfor %}
-                        </div>
-                    </div>
+                    {% for profile in reviewData %}
+                    <p>{{profile.owner.username}}</p>
+                    {% endfor %}
+
+                    <h1>{{reviewData.owner.username}}</h1>
+
                 </div>
+                <div class="user-downside">
+
+                </div>
+            </div>
+            <div class="review">
 
             </div>
         </div>
     </div>
-
     <div class="footer">
         <div class="footer-container">
             <div class="footer-title">
