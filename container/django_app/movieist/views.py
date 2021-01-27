@@ -190,10 +190,12 @@ def review(request, movie_id):
     if (request.method == 'POST'):
         obj = Review()
         form = ReviewForm(request.POST, instance=obj)
+        star = request.POST["star"]
         if form.is_valid():
             review = form.save(commit=False)
             review.owner = request.user
             review.movie_id = movie_id
+            review.star = star
             review.save()
         return redirect(to='/movieist/movieselect')
     params = {
@@ -202,14 +204,30 @@ def review(request, movie_id):
         'movie': movie_id
     }
 
-    return render(request, 'movieist/review.vue', params)
+    return render(request, 'movieist/review.html', params)
 
 
 @login_required(login_url='/movieist/accounts/login/')
 def profile(request):
-    reviewData = Review.objects.filter(owner=request.user.id)
+    profileData = Profile.objects.filter(id=request.user.id)
+    reviewDataOrg = Review.objects.filter(owner=request.user.id)
+    reviewData = (add_movie_info(review) for review in reviewDataOrg)
+
     params = {
+        'reviewDataOrg': reviewDataOrg,
+        'profileData': profileData,
         'reviewData': reviewData,
+
     }
 
     return render(request, 'movieist/profile.html', params)
+
+
+def add_movie_info(review):
+    movie_info = api.get_movie(review.movie_id)
+    image = api.get_movie_images(review.movie_id)
+
+    review.title = movie_info['title']
+    review.image_path = f"{api.img_base_url_}{image['posters'][0]['file_path']}"
+
+    return review

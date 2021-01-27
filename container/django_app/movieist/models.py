@@ -8,7 +8,9 @@ from django.dispatch import receiver
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    userPic = models.ImageField(upload_to='documents/', default='defo')
+    userPic = models.ImageField(
+        upload_to='documents/', default='documents/default_image1.png')
+    userComment = models.TextField(default='コメントがありません')
 
 
 @receiver(post_save, sender=User)
@@ -29,6 +31,7 @@ class Review(models.Model):
     movie_id = models.IntegerField()
     good = models.IntegerField(default=0)
     bad = models.IntegerField(default=0)
+    star = models.DecimalField(default=0, max_digits=2, decimal_places=1)
 
 
 class Follow(models.Model):

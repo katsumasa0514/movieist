@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <title>{{page_title}}</title>
     <link rel="stylesheet" type="text/css" href="{% static 'movieist/css/style.css' %}" />
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
     <script src="https://unpkg.com/vue-star-rating@1.7.0/dist/VueStarRating.umd.min.js"></script>
 </head>
 
@@ -28,23 +28,27 @@
         </div>
     </div>
 
-    <div class="main">
+    <div id="app" class="main">
         <div class="container">
             <h1>{{title}}</h1>
-            <div id="app">
-                <h2>basic</h2>
-                <star-rating></star-rating>
+            <div class="star-rating">
+                <h2>評価</h2>
+                <star-rating :increment="0.5" :star-size="35" v-model="boundRating"></star-rating>
             </div>
-            <table>
-                <form action="{% url 'review' movie %}" method="post">
+
+            <form action="{% url 'review' movie %}" method="post">
+                <table>
                     {% csrf_token %}
                     {{form}}
                     <tr>
                         <td></td>
-                        <td><input type="submit" value="送信"></td>
+                        <td>
+                            <input type="hidden" name="star" :value="boundRating">
+                            <input type="submit" value="送信">
+                        </td>
                     </tr>
-                </form>
-            </table>
+                </table>
+            </form>
         </div>
     </div>
 
@@ -69,17 +73,21 @@
             </div>
         </div>
     </div>
+
     <script>
-        Vue.component('star-rating', VueStarRating.default)
+        Vue.component("star-rating", VueStarRating.default);
 
         new Vue({
-            el: '#app',
+            el: "#app",
             methods: {
                 setRating: function (rating) {
                     this.rating = "You have Selected: " + rating + " stars";
                 },
                 showCurrentRating: function (rating) {
-                    this.currentRating = (rating === 0) ? this.currentSelectedRating : "Click to select " + rating + " stars"
+                    this.currentRating =
+                        rating === 0
+                            ? this.currentSelectedRating
+                            : "Click to select " + rating + " stars";
                 },
                 setCurrentSelectedRating: function (rating) {
                     this.currentSelectedRating = "You have Selected: " + rating + " stars";
@@ -89,10 +97,11 @@
                 rating: "No Rating Selected",
                 currentRating: "No Rating",
                 currentSelectedRating: "No Current Rating",
-                boundRating: 3,
+                boundRating: 3
             }
         });
     </script>
+
 </body>
 
 </html>
