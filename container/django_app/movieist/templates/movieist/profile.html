@@ -35,14 +35,27 @@
             {% for profile in profileData %}
             <div class="user">
                 <div class="user-upside">
-                    <img src="{{ profile.userPic.url }}" width="100" height="100" />
-                    <h3>{{profile.user.username}}</h3>
+                    <div class="left-box">
+                        <img src="{{ profile.userPic.url }}" width="100" height="100" />
+                        <h3>{{profile.user.username}}</h3>
+                    </div>
+                    <div class="right-box">
+                        <div class="count-review">
+
+                        </div>
+                        <div class="follower">
+                            <h1>{{followerData}}</h1>
+                        </div>
+                        <div class="following">
+                            <h1>{{followingData}}</h1>
+                        </div>
+                    </div>
                 </div>
                 <div class="user-downside">
                     <div class="user-comment">
                         <p>{{profile.userComment}}</p>
                     </div>
-                    <a href="">プロフィール編集</a>
+                    <a href="editprofile">プロフィール編集</a>
                 </div>
             </div>
             {% endfor %}

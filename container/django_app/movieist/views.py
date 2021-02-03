@@ -1,14 +1,15 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .forms import FindForm
-from .forms import ReviewForm
+from .forms import FindForm, ReviewForm, ProfileForm, UserForm
 from .models import Review, Profile, Follow
 import requests
 import json
 from pprint import pprint
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect
 from django.contrib.auth.models import User
+from django.urls import reverse
+from faker import Faker
+
 
 token = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4YjY5ZjBmMGE0NDBiYjc1NmEwMjE0MjEwYzZlZDZjMiIsInN1YiI6IjVmY2FlMWNlMzk0YTg3MDA0MWQ2MDBlNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Y4BNiKaz70SktudaUey9MOHMAbhW6dEqCMqFO8RKN9Y'
 
@@ -126,21 +127,12 @@ def homepage(request):
 
 
 def search(request):
-    if (request.method == 'POST'):
-        msg = request.POST['find']
-        dataFind = Search.object.filter(title__icontains=msg).order_by('good')[
-            int(list[0]): int(list[10])]
-        form = FindForm(request.POST)
 
-    else:
-        genreList = api.get_genre_movies()
-        for i in genreList:
-            dataFind = Search.object.filter(genres=i['genres'][0]['name']).order_by('good')[
-                int(list[0]): int(list[3])]
-        form = FindForm()
+    genreList = api.get_genre_movies()
+    print(genreList)
+
     params = {
-        'data': dataFind,
-        'form': form,
+
     }
 
     return render(request, 'movieist/search.html', params)
@@ -168,14 +160,12 @@ def overview(request, movie_id):
     res = api.get_movie(movie_id)
     image = api.get_movie_images(movie_id)
     image = f"{api.img_base_url_}{image['posters'][0]['file_path']}"
-    review = ("レビュー>")
 
     params = {
         'title': res['title'],
         'overview': res['overview'],
         'image': image,
         'form': FindForm(request.POST),
-        'review': review,
         'movie_id': movie_id,
     }
 
@@ -197,7 +187,7 @@ def review(request, movie_id):
             review.movie_id = movie_id
             review.star = star
             review.save()
-        return redirect(to='/movieist/movieselect')
+        return redirect(to='/movieist/profile')
     params = {
         'form': ReviewForm(),
         'title': title,
@@ -209,14 +199,20 @@ def review(request, movie_id):
 
 @login_required(login_url='/movieist/accounts/login/')
 def profile(request):
-    profileData = Profile.objects.filter(id=request.user.id)
+    profileData = Profile.objects.filter(user=request.user.id)
     reviewDataOrg = Review.objects.filter(owner=request.user.id)
     reviewData = (add_movie_info(review) for review in reviewDataOrg)
+    followingData = Follow.objects.filter(
+        owner=request.user.id, following__isnull=False).values('following').count()
+    followerData = Follow.objects.filter(
+        owner=request.user.id, follower__isnull=False).values('follower').count()
 
     params = {
         'reviewDataOrg': reviewDataOrg,
         'profileData': profileData,
         'reviewData': reviewData,
+        'followingData': followingData,
+        'followerData': followerData,
 
     }
 
@@ -231,3 +227,73 @@ def add_movie_info(review):
     review.image_path = f"{api.img_base_url_}{image['posters'][0]['file_path']}"
 
     return review
+
+
+def editprofile(request):
+    profileData = Profile.objects.get(user=request.user.id)
+    userData = User.objects.get(id=request.user.id)
+
+    if (request.method == 'POST'):
+        profileForm = ProfileForm(request.POST, request.FILES, instance=profileData)
+        userForm = UserForm(request.POST, instance=userData)
+        if profileForm.is_valid() and userForm.is_valid():
+            userForm.save()
+            profileForm.save()
+            return redirect(to='/movieist/profile')
+
+    params = {
+        'profileForm': ProfileForm(instance=profileData),
+        'userForm': UserForm(instance=userData),
+    }
+
+    return render(request, 'movieist/editprofile.html', params)
+
+
+def reviewer(request, user_id):
+    profileData = Profile.objects.filter(user=user_id)
+    reviewDataOrg = Review.objects.filter(owner=user_id)
+
+    reviewData = (add_movie_info(review) for review in reviewDataOrg)
+    followingData = Follow.objects.filter(
+        owner=user_id, following__isnull=False).values('following').count()
+    followerData = Follow.objects.filter(
+        owner=user_id, follower__isnull=False).values('follower').count()
+
+    if (Follow.objects.filter(owner=request.user.id, following=user_id)):
+        follow = "フォロー中"
+        if (request.method == 'POST'):
+            following = Follow.objects.filter(owner=request.user.id, following=user_id).delete()
+            url = reverse('reviewer', kwargs={'user_id': user_id})
+            return redirect(url)
+
+    else:
+        follow = "フォロー"
+        if (request.method == 'POST'):
+            following = Follow.objects.filter(owner=request.user.id).create(
+                following=user_id, owner_id=request.user.id)
+            following.save()
+            url = reverse('reviewer', kwargs={'user_id': user_id})
+            return redirect(url)
+
+    params = {
+        'reviewDataOrg': reviewDataOrg,
+        'profileData': profileData,
+        'reviewData': reviewData,
+        'followingData': followingData,
+        'followerData': followerData,
+        'user_id': user_id,
+        'follow': follow,
+    }
+
+    return render(request, 'movieist/reviewer.html', params)
+
+
+def add_user(request):
+    fakegen = Faker('ja_JP')
+    fake_name = fakegen.name()
+    fake_email = fakegen.email()
+    user, created = User.objects.get_or_create(username=fake_name, email=fake_email)
+    if created:
+        user.set_password('nawa0514')
+        user.save()
+    return user, created

@@ -17,6 +17,7 @@ class Profile(models.Model):
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
+        Follow.objects.create(owner=instance)
 
 
 @receiver(post_save, sender=User)
@@ -36,5 +37,5 @@ class Review(models.Model):
 
 class Follow(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='follow_owner')
-    following = models.IntegerField(default=0)
-    follower = models.IntegerField(default=0)
+    following = models.IntegerField(null=True)
+    follower = models.IntegerField(null=True)
