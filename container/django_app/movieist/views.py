@@ -288,6 +288,68 @@ def reviewer(request, user_id):
     return render(request, 'movieist/reviewer.html', params)
 
 
+def following(request, user_id):
+    followingDataOrg = Follow.objects.filter(owner=user_id, following__isnull=False)
+    followingData = (following_info(follow) for follow in followingDataOrg)
+
+    if (request.method == 'POST'):
+        Follow.objects.filter(owner=user_id, following=request.POST["id"]).delete()
+        url = reverse('following', kwargs={'user_id': user_id})
+        return redirect(url)
+
+    params = {
+        'followingData': followingData,
+        'user_id': user_id,
+    }
+
+    return render(request, 'movieist/following.html', params)
+
+
+def following_info(follow):
+    profileData = Profile.objects.filter(user=follow.following)
+
+    follow.profile = profileData
+
+    return follow
+
+
+def follower(request, user_id):
+    followerDataOrg = Follow.objects.filter(owner=user_id, follower__isnull=False)
+    followerData = (follower_info(follow, user_id) for follow in followerDataOrg)
+
+    if (request.method == 'POST'):
+        if (Follow.objects.filter(owner=user_id, following=request.POST["id"])):
+            Follow.objects.filter(owner=user_id, following=request.POST["id"]).delete()
+            url = reverse('follower', kwargs={'user_id': user_id})
+            return redirect(url)
+
+        else:
+            follower = Follow.objects.filter(owner=user_id).create(
+                following=request.POST["id"], owner_id=user_id)
+            follower.save()
+            url = reverse('follower', kwargs={'user_id': user_id})
+            return redirect(url)
+
+    params = {
+        'followerData': followerData,
+        'user_id': user_id,
+    }
+
+    return render(request, 'movieist/follower.html', params)
+
+
+def follower_info(follow, user_id):
+    profileData = Profile.objects.filter(user=follow.follower)
+    follow.profile = profileData
+
+    if (Follow.objects.filter(owner=user_id, following=follow.follower)):
+        follow.button = "フォロー中"
+    else:
+        follow.button = "フォロー"
+
+    return follow
+
+
 def add_user(request):
     fakegen = Faker('ja_JP')
     fake_name = fakegen.name()
