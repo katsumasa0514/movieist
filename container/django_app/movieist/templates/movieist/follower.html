@@ -34,7 +34,7 @@
                 {% for follower in follow.profile %}
                 <div class="left-box">
                     <img src="{{follower.userPic.url}}" width="100" height="100" />
-                    <p>{{follower.user.username}}</p>
+                    <a href="/movieist/reviewer/{{follow.follower}}">{{follower.user.username}}</a>
                 </div>
                 {% endfor %}
                 <div class="right-box">

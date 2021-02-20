@@ -95,6 +95,9 @@ DATABASES = {
         'PASSWORD': 'nawa0514',
         'HOST': 'localhost',
         'POST': '3306',
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        }
     }
 }
 

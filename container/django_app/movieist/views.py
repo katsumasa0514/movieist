@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .forms import FindForm, ReviewForm, ProfileForm, UserForm
-from .models import Review, Profile, Follow
+from .models import Review, Profile, Follow, Goodbad
 import requests
 import json
 from pprint import pprint
@@ -9,6 +9,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.urls import reverse
 from faker import Faker
+from faker.generator import random
+import csv
+from io import TextIOWrapper, StringIO
+import random
 
 
 token = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4YjY5ZjBmMGE0NDBiYjc1NmEwMjE0MjEwYzZlZDZjMiIsInN1YiI6IjVmY2FlMWNlMzk0YTg3MDA0MWQ2MDBlNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Y4BNiKaz70SktudaUey9MOHMAbhW6dEqCMqFO8RKN9Y'
@@ -112,7 +116,7 @@ class TMDB:
         return self._json_by_get_request(url)
 
     def get_genre_movies(self):
-        url = f'{self.base_url_}genre/movie/list?api_key=8b69f0f0a440bb756a0214210c6ed6c2&language=en'
+        url = f'{self.base_url_}genre/movie/list?api_key=8b69f0f0a440bb756a0214210c6ed6c2&language=ja'
         return self._json_by_get_request(url)
 
 
@@ -126,16 +130,455 @@ def homepage(request):
     return render(request, 'movieist/homepage.html', params)
 
 
-def search(request):
+def search(request, genre):
+    print(genre)
+    if (genre == "allgenre"):
+        actionDataOrg = Review.objects.filter(genre="アクション").order_by('-countgood')[:5]
+        actionData = (add_review_info(review) for review in actionDataOrg)
 
-    genreList = api.get_genre_movies()
-    print(genreList)
+        SFDataOrg = Review.objects.filter(genre="サイエンスフィクション").order_by('-countgood')[:5]
+        SFData = (add_review_info(review) for review in SFDataOrg)
+
+        mysteryDataOrg = Review.objects.filter(genre="謎").order_by('-countgood')[:5]
+        mysteryData = (add_review_info(review) for review in mysteryDataOrg)
+
+        dramaDataOrg = Review.objects.filter(genre="ドラマ").order_by('-countgood')[:5]
+        dramaData = (add_review_info(review) for review in dramaDataOrg)
+
+        comedyDataOrg = Review.objects.filter(genre="コメディ").order_by('-countgood')[:5]
+        comedyData = (add_review_info(review) for review in comedyDataOrg)
+
+        fantasyDataOrg = Review.objects.filter(genre="ファンタジー").order_by('-countgood')[:5]
+        fantasyData = (add_review_info(review) for review in fantasyDataOrg)
+
+        animeDataOrg = Review.objects.filter(genre="アニメーション").order_by('-countgood')[:5]
+        animeData = (add_review_info(review) for review in animeDataOrg)
+
+        romanceDataOrg = Review.objects.filter(genre="ロマンス").order_by('-countgood')[:5]
+        romanceData = (add_review_info(review) for review in romanceDataOrg)
+
+        adventureDataOrg = Review.objects.filter(genre="アドベンチャー").order_by('-countgood')[:5]
+        adventureData = (add_review_info(review) for review in adventureDataOrg)
+
+        crimeDataOrg = Review.objects.filter(genre="犯罪").order_by('-countgood')[:5]
+        crimeData = (add_review_info(review) for review in crimeDataOrg)
+
+        horrorDataOrg = Review.objects.filter(genre="ホラー").order_by('-countgood')[:5]
+        horrorData = (add_review_info(review) for review in horrorDataOrg)
+
+        documentaryDataOrg = Review.objects.filter(genre="ドキュメンタリー").order_by('-countgood')[:5]
+        documentaryData = (add_review_info(review) for review in documentaryDataOrg)
+
+    elif (genre == "action"):
+        genreDataOrg = Review.objects.filter(genre="アクション").order_by('-countgood')[:10]
+        genreData = (add_review_info(review) for review in genreDataOrg)
+
+        if 'good' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            goodData, created = Goodbad.objects.get_or_create(
+                owner=review_id, good=request.user.id)
+            if created:
+                review_id.countgood += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        if 'bad' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            badData, created = Goodbad.objects.get_or_create(
+                owner=review_id, bad=request.user.id)
+            if created:
+                review_id.countbad += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        params = {
+            'genreData': genreData,
+            'genrename': 'アクション',
+            'genre': genre,
+        }
+
+        return render(request, 'movieist/searchgenre.html', params)
+
+    elif (genre == "sf"):
+        genreDataOrg = Review.objects.filter(genre="サイエンスフィクション").order_by('-countgood')[:10]
+        genreData = (add_review_info(review) for review in genreDataOrg)
+
+        if 'good' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            goodData, created = Goodbad.objects.get_or_create(
+                owner=review_id, good=request.user.id)
+            if created:
+                review_id.countgood += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        if 'bad' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            badData, created = Goodbad.objects.get_or_create(
+                owner=review_id, bad=request.user.id)
+            if created:
+                review_id.countbad += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        params = {
+            'genreData': genreData,
+            'genrename': 'SF',
+            'genre': genre,
+        }
+
+        return render(request, 'movieist/searchgenre.html', params)
+
+    elif (genre == "mystery"):
+        genreDataOrg = Review.objects.filter(genre="謎").order_by('-countgood')[:10]
+        genreData = (add_review_info(review) for review in genreDataOrg)
+
+        if 'good' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            goodData, created = Goodbad.objects.get_or_create(
+                owner=review_id, good=request.user.id)
+            if created:
+                review_id.countgood += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        if 'bad' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            badData, created = Goodbad.objects.get_or_create(
+                owner=review_id, bad=request.user.id)
+            if created:
+                review_id.countbad += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        params = {
+            'genreData': genreData,
+            'genrename': 'ミステリー',
+            'genre': genre,
+        }
+
+        return render(request, 'movieist/searchgenre.html', params)
+
+    elif (genre == "drama"):
+        genreDataOrg = Review.objects.filter(genre="ドラマ").order_by('-countgood')[:10]
+        genreData = (add_review_info(review) for review in genreDataOrg)
+
+        if 'good' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            goodData, created = Goodbad.objects.get_or_create(
+                owner=review_id, good=request.user.id)
+            if created:
+                review_id.countgood += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        if 'bad' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            badData, created = Goodbad.objects.get_or_create(
+                owner=review_id, bad=request.user.id)
+            if created:
+                review_id.countbad += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        params = {
+            'genreData': genreData,
+            'genrename': 'ドラマ',
+            'genre': genre,
+        }
+
+        return render(request, 'movieist/searchgenre.html', params)
+
+    elif (genre == "comedy"):
+        genreDataOrg = Review.objects.filter(genre="コメディ").order_by('-countgood')[:10]
+        genreData = (add_review_info(review) for review in genreDataOrg)
+
+        if 'good' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            goodData, created = Goodbad.objects.get_or_create(
+                owner=review_id, good=request.user.id)
+            if created:
+                review_id.countgood += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        if 'bad' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            badData, created = Goodbad.objects.get_or_create(
+                owner=review_id, bad=request.user.id)
+            if created:
+                review_id.countbad += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        params = {
+            'genreData': genreData,
+            'genrename': 'コメディ',
+            'genre': genre,
+        }
+
+        return render(request, 'movieist/searchgenre.html', params)
+
+    elif (genre == "anime"):
+        genreDataOrg = Review.objects.filter(genre="アニメーション").order_by('-countgood')[:10]
+        genreData = (add_review_info(review) for review in genreDataOrg)
+
+        if 'good' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            goodData, created = Goodbad.objects.get_or_create(
+                owner=review_id, good=request.user.id)
+            if created:
+                review_id.countgood += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        if 'bad' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            badData, created = Goodbad.objects.get_or_create(
+                owner=review_id, bad=request.user.id)
+            if created:
+                review_id.countbad += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        params = {
+            'genreData': genreData,
+            'genrename': 'アニメ',
+            'genre': genre,
+        }
+
+        return render(request, 'movieist/searchgenre.html', params)
+
+    elif (genre == "romance"):
+        genreDataOrg = Review.objects.filter(genre="ロマンス").order_by('-countgood')[:10]
+        genreData = (add_review_info(review) for review in genreDataOrg)
+
+        if 'good' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            goodData, created = Goodbad.objects.get_or_create(
+                owner=review_id, good=request.user.id)
+            if created:
+                review_id.countgood += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        if 'bad' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            badData, created = Goodbad.objects.get_or_create(
+                owner=review_id, bad=request.user.id)
+            if created:
+                review_id.countbad += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        params = {
+            'genreData': genreData,
+            'genrename': 'ロマンス',
+            'genre': genre,
+        }
+
+        return render(request, 'movieist/searchgenre.html', params)
+
+    elif (genre == "adventure"):
+        genreDataOrg = Review.objects.filter(genre="アドベンチャー").order_by('-countgood')[:10]
+        genreData = (add_review_info(review) for review in genreDataOrg)
+
+        if 'good' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            goodData, created = Goodbad.objects.get_or_create(
+                owner=review_id, good=request.user.id)
+            if created:
+                review_id.countgood += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        if 'bad' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            badData, created = Goodbad.objects.get_or_create(
+                owner=review_id, bad=request.user.id)
+            if created:
+                review_id.countbad += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        params = {
+            'genreData': genreData,
+            'genrename': 'アドベンチャー',
+            'genre': genre,
+        }
+
+        return render(request, 'movieist/searchgenre.html', params)
+
+    elif (genre == "crime"):
+        genreDataOrg = Review.objects.filter(genre="犯罪").order_by('-countgood')[:10]
+        genreData = (add_review_info(review) for review in genreDataOrg)
+
+        if 'good' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            goodData, created = Goodbad.objects.get_or_create(
+                owner=review_id, good=request.user.id)
+            if created:
+                review_id.countgood += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        if 'bad' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            badData, created = Goodbad.objects.get_or_create(
+                owner=review_id, bad=request.user.id)
+            if created:
+                review_id.countbad += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        params = {
+            'genreData': genreData,
+            'genrename': 'クライム',
+            'genre': genre,
+        }
+
+        return render(request, 'movieist/searchgenre.html', params)
+
+    elif (genre == "horror"):
+        genreDataOrg = Review.objects.filter(genre="ホラー").order_by('-countgood')[:10]
+        genreData = (add_review_info(review) for review in genreDataOrg)
+
+        if 'good' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            goodData, created = Goodbad.objects.get_or_create(
+                owner=review_id, good=request.user.id)
+            if created:
+                review_id.countgood += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        if 'bad' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            badData, created = Goodbad.objects.get_or_create(
+                owner=review_id, bad=request.user.id)
+            if created:
+                review_id.countbad += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        params = {
+            'genreData': genreData,
+            'genrename': 'ホラー',
+            'genre': genre,
+        }
+
+        return render(request, 'movieist/searchgenre.html', params)
+
+    elif (genre == "documentary"):
+        genreDataOrg = Review.objects.filter(genre="ドキュメンタリー").order_by('-countgood')[:10]
+        genreData = (add_review_info(review) for review in genreDataOrg)
+
+        if 'good' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            goodData, created = Goodbad.objects.get_or_create(
+                owner=review_id, good=request.user.id)
+            if created:
+                review_id.countgood += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        if 'bad' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            badData, created = Goodbad.objects.get_or_create(
+                owner=review_id, bad=request.user.id)
+            if created:
+                review_id.countbad += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        params = {
+            'genreData': genreData,
+            'genrename': 'ドキュメンタリー',
+            'genre': genre,
+        }
+
+        return render(request, 'movieist/searchgenre.html', params)
+
+    elif (genre == "fantasy"):
+        genreDataOrg = Review.objects.filter(genre="ファンタジー").order_by('-countgood')[:10]
+        genreData = (add_review_info(review) for review in genreDataOrg)
+
+        if 'good' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            goodData, created = Goodbad.objects.get_or_create(
+                owner=review_id, good=request.user.id)
+            if created:
+                review_id.countgood += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        if 'bad' in request.POST:
+            review_id = Review.objects.get(id=request.POST["id"])
+            badData, created = Goodbad.objects.get_or_create(
+                owner=review_id, bad=request.user.id)
+            if created:
+                review_id.countbad += 1
+                review_id.save()
+            return redirect(to='/movieist/search/' + genre)
+
+        params = {
+            'genreData': genreData,
+            'genrename': 'ファンタジー',
+            'genre': genre,
+        }
+
+        return render(request, 'movieist/searchgenre.html', params)
+
+    if 'good' in request.POST:
+        review_id = Review.objects.get(id=request.POST["id"])
+        goodData, created = Goodbad.objects.get_or_create(
+            owner=review_id, good=request.user.id)
+        if created:
+            review_id.countgood += 1
+            review_id.save()
+        return redirect(to='/movieist/search/' + genre)
+
+    if 'bad' in request.POST:
+        review_id = Review.objects.get(id=request.POST["id"])
+        badData, created = Goodbad.objects.get_or_create(
+            owner=review_id, bad=request.user.id)
+        if created:
+            review_id.countbad += 1
+            review_id.save()
+        return redirect(to='/movieist/search/' + genre)
 
     params = {
-
+        'actionData': actionData,
+        'SFData': SFData,
+        'mysteryData': mysteryData,
+        'dramaData': dramaData,
+        'comedyData': comedyData,
+        'fantasyData': fantasyData,
+        'animeData': animeData,
+        'romanceData': romanceData,
+        'adventureData': adventureData,
+        'crimeData': crimeData,
+        'horrorData': horrorData,
+        'documentaryData': documentaryData,
+        'genre': genre,
     }
 
     return render(request, 'movieist/search.html', params)
+
+
+def add_review_info(review):
+    movie_info = api.get_movie(review.movie_id)
+    image = api.get_movie_images(review.movie_id)
+
+    review.title = movie_info['title']
+    try:
+        review.image_path = f"{api.img_base_url_}{image['posters'][0]['file_path']}"
+    except IndexError:
+        review.image_path = '/media/documents/noimage.jpg'
+
+    review.profile = Profile.objects.filter(user=review.owner)
+
+    return review
 
 
 def movieselect(request):
@@ -176,6 +619,7 @@ def overview(request, movie_id):
 def review(request, movie_id):
     res = api.get_movie(movie_id)
     title = res['title']
+    genre_1 = res['genres'][0]['name']
 
     if (request.method == 'POST'):
         obj = Review()
@@ -186,6 +630,7 @@ def review(request, movie_id):
             review.owner = request.user
             review.movie_id = movie_id
             review.star = star
+            review.genre = genre_1
             review.save()
         return redirect(to='/movieist/profile')
     params = {
@@ -207,13 +652,30 @@ def profile(request):
     followerData = Follow.objects.filter(
         owner=request.user.id, follower__isnull=False).values('follower').count()
 
+    if 'good' in request.POST:
+        review_id = Review.objects.get(id=request.POST["id"])
+        goodData, created = Goodbad.objects.get_or_create(
+            owner=review_id, good=request.user.id)
+        if created:
+            review_id.countgood += 1
+            review_id.save()
+        return redirect(to='/movieist/profile')
+
+    if 'bad' in request.POST:
+        review_id = Review.objects.get(id=request.POST["id"])
+        badData, created = Goodbad.objects.get_or_create(
+            owner=review_id, bad=request.user.id)
+        if created:
+            review_id.countgood += 1
+            review_id.save()
+        return redirect(to='/movieist/profile')
+
     params = {
         'reviewDataOrg': reviewDataOrg,
         'profileData': profileData,
         'reviewData': reviewData,
         'followingData': followingData,
         'followerData': followerData,
-
     }
 
     return render(request, 'movieist/profile.html', params)
@@ -351,11 +813,88 @@ def follower_info(follow, user_id):
 
 
 def add_user(request):
-    fakegen = Faker('ja_JP')
-    fake_name = fakegen.name()
-    fake_email = fakegen.email()
-    user, created = User.objects.get_or_create(username=fake_name, email=fake_email)
-    if created:
-        user.set_password('nawa0514')
-        user.save()
+    fake = Faker('ja_JP')
+    fake.random.seed(4321)
+
+    names = set()
+    emails = set()
+    while len(names) < 1000:
+
+        len(emails)
+        names.add(fake.name())
+        emails.add(fake.email())
+
+    for (name, email) in zip(names, emails):
+        user, created = User.objects.get_or_create(username=name, email=email)
+        if created:
+            user.set_password('nawa0514')
+            user.save()
     return user, created
+
+
+def add_csv(request):
+    if 'csv' in request.FILES:
+        form_data = TextIOWrapper(request.FILES['csv'].file, encoding='utf-8')
+        csv_file = csv.reader(form_data)
+        for line in csv_file:
+            movie_info = api.get_movie(line[0])
+            genres = movie_info['genres'][0]['name']
+            number = random.randrange(1, 1000)
+            numbers = User.objects.get(id=number)
+            review = Review()
+            review.owner = numbers
+            review.movie_id = line[0]
+            review.commentTitle = line[2]
+            review.comment = line[3]
+            review.star = line[4]
+            review.genre = genres
+            review.save()
+
+        return render(request, 'movieist/add_csv.html')
+
+    else:
+        return render(request, 'movieist/add_csv.html')
+
+
+def add_follow(request):
+    for i in range(1, 1000):
+        number_1 = random.randrange(2, 10)
+        for er in range(1, number_1):
+            user = User.objects.get(id=i)
+            follow = Follow()
+            follow.owner = user
+            number_2 = random.randrange(1, 1000)
+            follow.follower = number_2
+            follow.save()
+        number_3 = random.randrange(2, 10)
+        for er in range(1, number_3):
+            user = User.objects.get(id=i)
+            follow = Follow()
+            follow.owner = user
+            number_4 = random.randrange(1, 1000)
+            follow.following = number_4
+            follow.save()
+
+
+def add_goodbad(request):
+    for i in range(1, 778):
+        number_1 = random.randrange(2, 10)
+        for g in range(1, number_1):
+            review_id = Review.objects.get(id=i)
+            goodbad = Goodbad()
+            goodbad.owner = review_id
+            number_2 = random.randrange(1, 1000)
+            goodbad.good = number_2
+            goodbad.save()
+            review_id.countgood += 1
+            review_id.save()
+        number_3 = random.randrange(2, 10)
+        for b in range(1, number_3):
+            review_id = Review.objects.get(id=i)
+            goodbad = Goodbad()
+            goodbad.owner = review_id
+            number_4 = random.randrange(1, 1000)
+            goodbad.bad = number_4
+            goodbad.save()
+            review_id.countbad += 1
+            review_id.save()

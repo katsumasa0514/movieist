@@ -44,9 +44,11 @@
 
                         </div>
                         <div class="follower">
+                            <h3>follower</h3>
                             <a href="follower/{{profile.user_id}}">{{followerData}}</a>
                         </div>
                         <div class="following">
+                            <h3>following</h3>
                             <a href="following/{{profile.user_id}}">{{followingData}}</a>
                         </div>
                     </div>
@@ -74,8 +76,18 @@
                                     <h1>{{review.title}}</h1>
                                 </div>
                                 <div class="evaluation">
-                                    <h3>{{review.good}}</h3>
-                                    <h3>{{review.bad}}</h3>
+                                    <form action="{% url 'profile' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="id" value="{{review.id}}">
+                                        <input type="submit" name="good" value="GOOD">
+                                    </form>
+                                    <h3>{{review.countgood}}</h3>
+                                    <form action="{% url 'profile' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="id" value="{{review.id}}">
+                                        <input type="submit" name="bad" value="BAD">
+                                    </form>
+                                    <h3>{{review.countbad}}</h3>
                                 </div>
                             </div>
                             <div class="downBox">
