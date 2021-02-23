@@ -38,11 +38,13 @@
                 </div>
                 {% endfor %}
                 <div class="right-box">
+                    {% if follow.follower != request.user.id %}
                     <form action="{% url 'follower' user_id %}" method="post">
                         {% csrf_token %}
                         <input type="hidden" name="id" value="{{follow.follower}}">
                         <input type="submit" value="{{follow.button}}">
                     </form>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}

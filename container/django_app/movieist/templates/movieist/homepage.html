@@ -24,22 +24,98 @@
         </div>
     </div>
     <div class="main">
-        <div class="main-top">
-            <img src="" alt="">
-            <div class="top-title">
-                <h2>Movieist for contributor</h2>
-                <p>投稿者のおすすめから見つける映画情報サイト >>></p>
-            </div>
-        </div>
-        <div class="main-bottom">
-            <div class="container">
-                <div class="middle-notice">
-                    <h2>注目の投稿></h2>
-                    <div class="notice-review">
-
-                    </div>
+        <div class="container">
+            <div class="main-top">
+                <img src="" alt="">
+                <div class="top-title">
+                    <h2>Movieist for contributor</h2>
+                    <p>投稿者のおすすめから見つける映画情報サイト >>></p>
                 </div>
-                <div class="middle-"></div>
+            </div>
+            <div class="main-topic">
+                <div class="topictitle">
+                    <h2>注目の投稿></h2>
+                </div>
+                <div class="topic-notice">
+                    {% for topic in topicData %}
+                    <div class="notice-review">
+                        <div class="leftBox">
+                            <img src="{{topic.image_path}}">
+                            <h3>{{topic.title}}</h3>
+                        </div>
+                        <div class="rightBox">
+                            <div class="userAndEvaluation">
+                                {% for user in topic.profile %}
+                                <div class="user">
+                                    <img src="{{user.userPic.url}}" width="100" height="100" />
+                                    <a href="">{{user.user.username}}</a>
+                                </div>
+                                {% endfor %}
+                                <div class="evaluation">
+                                    <form topic="{% url 'homepage' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="id" value="{{topic.id}}">
+                                        <input type="submit" name="good" value="GOOD">
+                                    </form>
+                                    <h3>{{topic.countgood}}</h3>
+                                    <form topic="{% url 'homepage' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="id" value="{{topic.id}}">
+                                        <input type="submit" name="bad" value="BAD">
+                                    </form>
+                                    <h3>{{topic.countbad}}</h3>
+                                </div>
+                            </div>
+                            <div class="comments">
+                                <h3>{{topic.commentTitle}}</h3>
+                                <p>{{topic.comment}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="searchtitle">
+                        <h3>映画を探す></h3>
+                    </div>
+                    {% for search in searchData %}
+                    <div class="notice-review">
+                        <div class="leftBox">
+                            <img src="{{search.image_path}}">
+                            <h3>{{search.title}}</h3>
+                        </div>
+                        <div class="rightBox">
+                            <div class="userAndEvaluation">
+                                {% for user in search.profile %}
+                                <div class="user">
+                                    <img src="{{user.userPic.url}}" width="100" height="100" />
+                                    <a href="">{{user.user.username}}</a>
+                                </div>
+                                {% endfor %}
+                                <div class="evaluation">
+                                    <form search="{% url 'homepage' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="id" value="{{search.id}}">
+                                        <input type="submit" name="good" value="GOOD">
+                                    </form>
+                                    <h3>{{search.countgood}}</h3>
+                                    <form search="{% url 'homepage' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="id" value="{{search.id}}">
+                                        <input type="submit" name="bad" value="BAD">
+                                    </form>
+                                    <h3>{{search.countbad}}</h3>
+                                </div>
+                            </div>
+                            <div class="comments">
+                                <h3>{{search.commentTitle}}</h3>
+                                <p>{{search.comment}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="middle-">
+
+                </div>
             </div>
         </div>
     </div>

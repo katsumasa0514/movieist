@@ -55,10 +55,12 @@
                     <div class="user-comment">
                         <p>{{profile.userComment}}</p>
                     </div>
+                    {% if profile.user_id != request.user.id %}
                     <form action="{% url 'reviewer' user_id %}" method="post">
                         {% csrf_token %}
                         <input type="submit" value="{{follow}}">
                     </form>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}

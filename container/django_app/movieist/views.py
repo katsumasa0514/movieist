@@ -13,6 +13,8 @@ from faker.generator import random
 import csv
 from io import TextIOWrapper, StringIO
 import random
+import datetime
+from django.db.models import Count
 
 
 token = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4YjY5ZjBmMGE0NDBiYjc1NmEwMjE0MjEwYzZlZDZjMiIsInN1YiI6IjVmY2FlMWNlMzk0YTg3MDA0MWQ2MDBlNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Y4BNiKaz70SktudaUey9MOHMAbhW6dEqCMqFO8RKN9Y'
@@ -124,14 +126,80 @@ api = TMDB(token)
 
 
 def homepage(request):
+    if 'good' in request.POST:
+        review_id = Review.objects.get(id=request.POST["id"])
+        goodData, created = Goodbad.objects.get_or_create(
+            owner=review_id, good=request.user.id)
+        if created:
+            review_id.countgood += 1
+            review_id.save()
+        return redirect(to='/movieist/')
+
+    if 'bad' in request.POST:
+        review_id = Review.objects.get(id=request.POST["id"])
+        badData, created = Goodbad.objects.get_or_create(
+            owner=review_id, bad=request.user.id)
+        if created:
+            review_id.countbad += 1
+            review_id.save()
+        return redirect(to='/movieist/')
+
+    one_week_ago = datetime.datetime.now() - datetime.timedelta(days=7)
+    topicDataOrg = Review.objects.filter(
+        datetime__range=[one_week_ago, datetime.datetime.now()]).order_by("-countgood")[:5]
+    topicData = (add_review_info(review) for review in topicDataOrg)
+    searchDataOrg = Review.objects.all().order_by("-countgood")[:5]
+    searchData = (add_review_info(review) for review in searchDataOrg)
+
     params = {
-        'title': 'Hello/homepage',
+        'title': 'homepage',
+        'topicData': topicData,
+        'searchData': searchData,
     }
     return render(request, 'movieist/homepage.html', params)
 
 
+def reviewer_ranking(request):
+    rankingDataOrg = Follow.objects.annotate(count=Count(
+        'follow_set__follower')).order_by('-count')[:15]
+    rankingData = (add_ranking_info(ranking) for ranking in rankingDataOrg)
+
+    params = {
+        'rankingData': rankingData,
+    }
+    return render(request, 'movieist/reviewer_ranking.html', params)
+
+
+def add_ranking_info(ranking):
+    ranking.profile = Profile.objects.filter(user=ranking.owner)
+
+    ranking.countFollowing = Follow.objects.filter(
+        owner=ranking.owner, following__isnull=False).values('following').count()
+    ranking.countFollower = Follow.objects.filter(
+        owner=ranking.owner, follower__isnull=False).values('follower').count()
+
+    return ranking
+
+
 def search(request, genre):
-    print(genre)
+    if 'good' in request.POST:
+        review_id = Review.objects.get(id=request.POST["id"])
+        goodData, created = Goodbad.objects.get_or_create(
+            owner=review_id, good=request.user.id)
+        if created:
+            review_id.countgood += 1
+            review_id.save()
+        return redirect(to='/movieist/search/' + genre)
+
+    if 'bad' in request.POST:
+        review_id = Review.objects.get(id=request.POST["id"])
+        badData, created = Goodbad.objects.get_or_create(
+            owner=review_id, bad=request.user.id)
+        if created:
+            review_id.countbad += 1
+            review_id.save()
+        return redirect(to='/movieist/search/' + genre)
+
     if (genre == "allgenre"):
         actionDataOrg = Review.objects.filter(genre="アクション").order_by('-countgood')[:5]
         actionData = (add_review_info(review) for review in actionDataOrg)
@@ -173,24 +241,6 @@ def search(request, genre):
         genreDataOrg = Review.objects.filter(genre="アクション").order_by('-countgood')[:10]
         genreData = (add_review_info(review) for review in genreDataOrg)
 
-        if 'good' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            goodData, created = Goodbad.objects.get_or_create(
-                owner=review_id, good=request.user.id)
-            if created:
-                review_id.countgood += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
-
-        if 'bad' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            badData, created = Goodbad.objects.get_or_create(
-                owner=review_id, bad=request.user.id)
-            if created:
-                review_id.countbad += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
-
         params = {
             'genreData': genreData,
             'genrename': 'アクション',
@@ -202,24 +252,6 @@ def search(request, genre):
     elif (genre == "sf"):
         genreDataOrg = Review.objects.filter(genre="サイエンスフィクション").order_by('-countgood')[:10]
         genreData = (add_review_info(review) for review in genreDataOrg)
-
-        if 'good' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            goodData, created = Goodbad.objects.get_or_create(
-                owner=review_id, good=request.user.id)
-            if created:
-                review_id.countgood += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
-
-        if 'bad' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            badData, created = Goodbad.objects.get_or_create(
-                owner=review_id, bad=request.user.id)
-            if created:
-                review_id.countbad += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
 
         params = {
             'genreData': genreData,
@@ -233,27 +265,9 @@ def search(request, genre):
         genreDataOrg = Review.objects.filter(genre="謎").order_by('-countgood')[:10]
         genreData = (add_review_info(review) for review in genreDataOrg)
 
-        if 'good' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            goodData, created = Goodbad.objects.get_or_create(
-                owner=review_id, good=request.user.id)
-            if created:
-                review_id.countgood += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
-
-        if 'bad' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            badData, created = Goodbad.objects.get_or_create(
-                owner=review_id, bad=request.user.id)
-            if created:
-                review_id.countbad += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
-
         params = {
             'genreData': genreData,
-            'genrename': 'ミステリー',
+            'genrename': 'サスペンス',
             'genre': genre,
         }
 
@@ -262,24 +276,6 @@ def search(request, genre):
     elif (genre == "drama"):
         genreDataOrg = Review.objects.filter(genre="ドラマ").order_by('-countgood')[:10]
         genreData = (add_review_info(review) for review in genreDataOrg)
-
-        if 'good' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            goodData, created = Goodbad.objects.get_or_create(
-                owner=review_id, good=request.user.id)
-            if created:
-                review_id.countgood += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
-
-        if 'bad' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            badData, created = Goodbad.objects.get_or_create(
-                owner=review_id, bad=request.user.id)
-            if created:
-                review_id.countbad += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
 
         params = {
             'genreData': genreData,
@@ -293,24 +289,6 @@ def search(request, genre):
         genreDataOrg = Review.objects.filter(genre="コメディ").order_by('-countgood')[:10]
         genreData = (add_review_info(review) for review in genreDataOrg)
 
-        if 'good' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            goodData, created = Goodbad.objects.get_or_create(
-                owner=review_id, good=request.user.id)
-            if created:
-                review_id.countgood += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
-
-        if 'bad' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            badData, created = Goodbad.objects.get_or_create(
-                owner=review_id, bad=request.user.id)
-            if created:
-                review_id.countbad += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
-
         params = {
             'genreData': genreData,
             'genrename': 'コメディ',
@@ -322,24 +300,6 @@ def search(request, genre):
     elif (genre == "anime"):
         genreDataOrg = Review.objects.filter(genre="アニメーション").order_by('-countgood')[:10]
         genreData = (add_review_info(review) for review in genreDataOrg)
-
-        if 'good' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            goodData, created = Goodbad.objects.get_or_create(
-                owner=review_id, good=request.user.id)
-            if created:
-                review_id.countgood += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
-
-        if 'bad' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            badData, created = Goodbad.objects.get_or_create(
-                owner=review_id, bad=request.user.id)
-            if created:
-                review_id.countbad += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
 
         params = {
             'genreData': genreData,
@@ -353,24 +313,6 @@ def search(request, genre):
         genreDataOrg = Review.objects.filter(genre="ロマンス").order_by('-countgood')[:10]
         genreData = (add_review_info(review) for review in genreDataOrg)
 
-        if 'good' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            goodData, created = Goodbad.objects.get_or_create(
-                owner=review_id, good=request.user.id)
-            if created:
-                review_id.countgood += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
-
-        if 'bad' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            badData, created = Goodbad.objects.get_or_create(
-                owner=review_id, bad=request.user.id)
-            if created:
-                review_id.countbad += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
-
         params = {
             'genreData': genreData,
             'genrename': 'ロマンス',
@@ -382,24 +324,6 @@ def search(request, genre):
     elif (genre == "adventure"):
         genreDataOrg = Review.objects.filter(genre="アドベンチャー").order_by('-countgood')[:10]
         genreData = (add_review_info(review) for review in genreDataOrg)
-
-        if 'good' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            goodData, created = Goodbad.objects.get_or_create(
-                owner=review_id, good=request.user.id)
-            if created:
-                review_id.countgood += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
-
-        if 'bad' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            badData, created = Goodbad.objects.get_or_create(
-                owner=review_id, bad=request.user.id)
-            if created:
-                review_id.countbad += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
 
         params = {
             'genreData': genreData,
@@ -413,24 +337,6 @@ def search(request, genre):
         genreDataOrg = Review.objects.filter(genre="犯罪").order_by('-countgood')[:10]
         genreData = (add_review_info(review) for review in genreDataOrg)
 
-        if 'good' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            goodData, created = Goodbad.objects.get_or_create(
-                owner=review_id, good=request.user.id)
-            if created:
-                review_id.countgood += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
-
-        if 'bad' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            badData, created = Goodbad.objects.get_or_create(
-                owner=review_id, bad=request.user.id)
-            if created:
-                review_id.countbad += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
-
         params = {
             'genreData': genreData,
             'genrename': 'クライム',
@@ -442,24 +348,6 @@ def search(request, genre):
     elif (genre == "horror"):
         genreDataOrg = Review.objects.filter(genre="ホラー").order_by('-countgood')[:10]
         genreData = (add_review_info(review) for review in genreDataOrg)
-
-        if 'good' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            goodData, created = Goodbad.objects.get_or_create(
-                owner=review_id, good=request.user.id)
-            if created:
-                review_id.countgood += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
-
-        if 'bad' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            badData, created = Goodbad.objects.get_or_create(
-                owner=review_id, bad=request.user.id)
-            if created:
-                review_id.countbad += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
 
         params = {
             'genreData': genreData,
@@ -473,24 +361,6 @@ def search(request, genre):
         genreDataOrg = Review.objects.filter(genre="ドキュメンタリー").order_by('-countgood')[:10]
         genreData = (add_review_info(review) for review in genreDataOrg)
 
-        if 'good' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            goodData, created = Goodbad.objects.get_or_create(
-                owner=review_id, good=request.user.id)
-            if created:
-                review_id.countgood += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
-
-        if 'bad' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            badData, created = Goodbad.objects.get_or_create(
-                owner=review_id, bad=request.user.id)
-            if created:
-                review_id.countbad += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
-
         params = {
             'genreData': genreData,
             'genrename': 'ドキュメンタリー',
@@ -503,24 +373,6 @@ def search(request, genre):
         genreDataOrg = Review.objects.filter(genre="ファンタジー").order_by('-countgood')[:10]
         genreData = (add_review_info(review) for review in genreDataOrg)
 
-        if 'good' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            goodData, created = Goodbad.objects.get_or_create(
-                owner=review_id, good=request.user.id)
-            if created:
-                review_id.countgood += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
-
-        if 'bad' in request.POST:
-            review_id = Review.objects.get(id=request.POST["id"])
-            badData, created = Goodbad.objects.get_or_create(
-                owner=review_id, bad=request.user.id)
-            if created:
-                review_id.countbad += 1
-                review_id.save()
-            return redirect(to='/movieist/search/' + genre)
-
         params = {
             'genreData': genreData,
             'genrename': 'ファンタジー',
@@ -528,24 +380,6 @@ def search(request, genre):
         }
 
         return render(request, 'movieist/searchgenre.html', params)
-
-    if 'good' in request.POST:
-        review_id = Review.objects.get(id=request.POST["id"])
-        goodData, created = Goodbad.objects.get_or_create(
-            owner=review_id, good=request.user.id)
-        if created:
-            review_id.countgood += 1
-            review_id.save()
-        return redirect(to='/movieist/search/' + genre)
-
-    if 'bad' in request.POST:
-        review_id = Review.objects.get(id=request.POST["id"])
-        badData, created = Goodbad.objects.get_or_create(
-            owner=review_id, bad=request.user.id)
-        if created:
-            review_id.countbad += 1
-            review_id.save()
-        return redirect(to='/movieist/search/' + genre)
 
     params = {
         'actionData': actionData,
@@ -603,6 +437,8 @@ def overview(request, movie_id):
     res = api.get_movie(movie_id)
     image = api.get_movie_images(movie_id)
     image = f"{api.img_base_url_}{image['posters'][0]['file_path']}"
+    reviewDataOrg = Review.objects.filter(movie_id=movie_id)[:10]
+    reviewData = (add_review_info(review) for review in reviewDataOrg)
 
     params = {
         'title': res['title'],
@@ -610,6 +446,7 @@ def overview(request, movie_id):
         'image': image,
         'form': FindForm(request.POST),
         'movie_id': movie_id,
+        'reviewData': reviewData,
     }
 
     return render(request, 'movieist/overview.html', params)
@@ -724,16 +561,22 @@ def reviewer(request, user_id):
     if (Follow.objects.filter(owner=request.user.id, following=user_id)):
         follow = "フォロー中"
         if (request.method == 'POST'):
-            following = Follow.objects.filter(owner=request.user.id, following=user_id).delete()
+            # 自分のフォロー中から相手を削除
+            Follow.objects.filter(owner=request.user.id, following=user_id).delete()
+            # 相手のフォロワーから自分を削除
+            Follow.objects.filter(owner=user_id, follower=request.user.id).delete()
             url = reverse('reviewer', kwargs={'user_id': user_id})
             return redirect(url)
 
     else:
         follow = "フォロー"
         if (request.method == 'POST'):
-            following = Follow.objects.filter(owner=request.user.id).create(
+            createFollowing = Follow.objects.filter(owner=request.user.id).create(
                 following=user_id, owner_id=request.user.id)
-            following.save()
+            createFollowing.save()
+            createFollower = Follow.objects.filter(owner=user_id).create(
+                follower=request.user.id, owner_id=user_id)
+            createFollower.save()
             url = reverse('reviewer', kwargs={'user_id': user_id})
             return redirect(url)
 
@@ -745,6 +588,7 @@ def reviewer(request, user_id):
         'followerData': followerData,
         'user_id': user_id,
         'follow': follow,
+        'request.user.id': request.user.id,
     }
 
     return render(request, 'movieist/reviewer.html', params)
@@ -756,6 +600,7 @@ def following(request, user_id):
 
     if (request.method == 'POST'):
         Follow.objects.filter(owner=user_id, following=request.POST["id"]).delete()
+        Follow.objects.filter(owner=request.POST["id"], follower=user_id).delete()
         url = reverse('following', kwargs={'user_id': user_id})
         return redirect(url)
 
@@ -777,34 +622,43 @@ def following_info(follow):
 
 def follower(request, user_id):
     followerDataOrg = Follow.objects.filter(owner=user_id, follower__isnull=False)
-    followerData = (follower_info(follow, user_id) for follow in followerDataOrg)
+    followerData = (follower_info(follow, user_id, request) for follow in followerDataOrg)
 
     if (request.method == 'POST'):
-        if (Follow.objects.filter(owner=user_id, following=request.POST["id"])):
-            Follow.objects.filter(owner=user_id, following=request.POST["id"]).delete()
+        if (request.POST["id"] == request.user.id):
+            url = reverse('follower', kwargs={'user_id': user_id})
+            return redirect(url)
+
+        elif (Follow.objects.filter(owner=request.user.id, following=request.POST["id"])):
+            Follow.objects.filter(owner=request.user.id, following=request.POST["id"]).delete()
+            Follow.objects.filter(owner=request.POST["id"], follower=request.user.id).delete()
             url = reverse('follower', kwargs={'user_id': user_id})
             return redirect(url)
 
         else:
-            follower = Follow.objects.filter(owner=user_id).create(
-                following=request.POST["id"], owner_id=user_id)
-            follower.save()
+            createFollowing = Follow.objects.filter(owner=request.user.id).create(
+                following=request.POST["id"], owner_id=request.user.id)
+            createFollowing.save()
+            createFollower = Follow.objects.filter(owner=request.POST["id"]).create(
+                follower=request.user.id, owner_id=request.POST["id"])
+            createFollower.save()
             url = reverse('follower', kwargs={'user_id': user_id})
             return redirect(url)
 
     params = {
         'followerData': followerData,
         'user_id': user_id,
+        'request.user.id': request.user.id,
     }
 
     return render(request, 'movieist/follower.html', params)
 
 
-def follower_info(follow, user_id):
+def follower_info(follow, user_id, request):
     profileData = Profile.objects.filter(user=follow.follower)
     follow.profile = profileData
 
-    if (Follow.objects.filter(owner=user_id, following=follow.follower)):
+    if (Follow.objects.filter(owner=request.user.id, following=follow.follower)):
         follow.button = "フォロー中"
     else:
         follow.button = "フォロー"
@@ -865,6 +719,7 @@ def add_follow(request):
             follow.owner = user
             number_2 = random.randrange(1, 1000)
             follow.follower = number_2
+            follow.countfollower += 1
             follow.save()
         number_3 = random.randrange(2, 10)
         for er in range(1, number_3):
@@ -873,6 +728,7 @@ def add_follow(request):
             follow.owner = user
             number_4 = random.randrange(1, 1000)
             follow.following = number_4
+            follow.countfollowing += 1
             follow.save()
 
 
