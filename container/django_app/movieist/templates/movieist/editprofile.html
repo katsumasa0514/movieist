@@ -1,68 +1,26 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="ja">
+{% extends 'movieist/base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="{% static 'movieist/css/style.css' %}" />
-    <title>{{page_title}}</title>
-</head>
-
-<body>
-    <div class="header">
-        <div class="header-title">
-            <h3>Movieist</h3>
-        </div>
-        <div class="header-list">
-            <ul>
-                <li>注目の映画</li>
-                <li>映画を探す</li>
-                <li>レビュアーランキング</li>
-                <li>レビューする</li>
+{% block content %}
+<div class="main">
+    <form action="{% url 'editprofile' %}" method="post" enctype="multipart/form-data">
+        <table>
+            {% csrf_token %}
+            {{profileForm}}
+            {{userForm}}
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+                    {% endfor %}
             </ul>
-        </div>
-        <div class="header-menu">
-            <img src="" alt="">
-        </div>
-    </div>
-    <div class="main">
-        <form action="{% url 'editprofile' %}" method="post" enctype="multipart/form-data">
-            <table>
-                {% csrf_token %}
-                {{profileForm}}
-                {{userForm}}
-                <tr>
-                    <td></td>
-                    <td>
-                        <input type="submit" value="送信">
-                    </td>
-                </tr>
-            </table>
-        </form>
-    </div>
-    <div class="footer">
-        <div class="footer-container">
-            <div class="footer-title">
-                <h3>Movieist></h3>
-                <p>投稿者のおすすめから見つける映画情報サイト >>></p>
-            </div>
-            <div class="footer-sitemap">
-                <ul>
-                    <li>/homePage</li>
-                    <li>/search</li>
-                    <li>/reviewerRanking</li>
-                    <li>/overview</li>
-                </ul>
-                <ul>
-                    <li>/login</li>
-                    <li>/sign up</li>
-                    <li>/profile</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-</body>
-
-</html>
+            {% endif %}
+            <tr>
+                <td></td>
+                <td>
+                    <input type="submit" value="送信">
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+{% endblock %}

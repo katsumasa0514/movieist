@@ -1,58 +1,49 @@
-<!DOCTYPE html>
-<html lang="ja">
+{% extends 'movieist/base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>{{title}}</title>
-</head>
-
-<body>
-    <div class="header">
-        <div class="header-title">
-            <h3>Movieist</h3>
+{% block content %}
+<div class="main">
+    <div class="container">
+        <div class="title">
+            <h2>レビュアーランキング></h2>
+            <a href="/movieist/reviewerselect">レビュアーを検索</a>
         </div>
-        <div class="header-list">
-            <ul>
-                <li>注目の映画</li>
-                <li>映画を探す</li>
-                <li>レビュアーランキング</li>
-                <li>レビューする</li>
-            </ul>
-        </div>
-        <div class="header-menu">
-            <img src="" alt="">
-        </div>
-    </div>
-    <div class="main">
-        <div class="container">
-            <div class="title">レビュアーランキング></div>
-            <div class="rankings">
-                {% for ranking in rankingData%}
-                <div class="ranking">
-                    {% for profile in ranking.profile %}
-                    <div class="user-info">
-                        <div class="upside">
+        <div class="rankings">
+            {% for ranking in rankingData %}
+            <div class="ranking">
+                {% for profile in ranking.profile %}
+                <div class="user-info">
+                    <div class="upside">
+                        <div class="left-box">
                             <img src="{{profile.userPic.url}}" width="100" height="100" />
                             <a href="/movieist/reviewer/{{profile.user_id}}">{{profile.user.username}}</a>
                         </div>
-                        <div class="downside">
-                            <h3>{{ranking.countFollower}}</h3>
-                            <p>{{profile.userComment}}</p>
+                        <div class="right-box">
+                            {% if follow.following != request.user.id %}
+                            <form action="{% url 'reviewer_ranking' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="follow" value="{{profile.user_id}}">
+                                <input type="submit" value="{{ranking.button}}">
+                            </form>
+                            {% endif %}
                         </div>
                     </div>
-                    {% endfor %}
-                    {% for reviewed in ranking.reviewed%}
-                    <div class="reviewed">
-                        <img src="{{reviewed.review.image_path}}">
+                    <div class="downside">
+                        <div class="countFollower">
+                            <h3>follower</h3>
+                            <h3>{{ranking.countFollower}}</h3>
+                        </div>
+                        <p>{{profile.userComment}}</p>
                     </div>
-                    {% endfor %}
                 </div>
                 {% endfor %}
             </div>
+            {% for reviewed in ranking.reviewed %}
+            <div class="reviewed">
+                <img src="{{reviewed.image_path}}">
+            </div>
+            {% endfor %}
+            {% endfor %}
         </div>
     </div>
-</body>
-{% block content %}
+</div>
 {% endblock %}
-
-</html>

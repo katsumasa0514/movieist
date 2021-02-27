@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .forms import FindForm, ReviewForm, ProfileForm, UserForm
+from .forms import FindMovieForm, FindReviewerForm, ReviewForm, ProfileForm, UserForm
 from .models import Review, Profile, Follow, Goodbad
 import requests
 import json
@@ -15,6 +15,8 @@ from io import TextIOWrapper, StringIO
 import random
 import datetime
 from django.db.models import Count
+from django.contrib import messages
+from .my_modules import goodbadModule, followModule
 
 
 token = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4YjY5ZjBmMGE0NDBiYjc1NmEwMjE0MjEwYzZlZDZjMiIsInN1YiI6IjVmY2FlMWNlMzk0YTg3MDA0MWQ2MDBlNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Y4BNiKaz70SktudaUey9MOHMAbhW6dEqCMqFO8RKN9Y'
@@ -126,79 +128,79 @@ api = TMDB(token)
 
 
 def homepage(request):
-    if 'good' in request.POST:
-        review_id = Review.objects.get(id=request.POST["id"])
-        goodData, created = Goodbad.objects.get_or_create(
-            owner=review_id, good=request.user.id)
-        if created:
-            review_id.countgood += 1
-            review_id.save()
-        return redirect(to='/movieist/')
-
-    if 'bad' in request.POST:
-        review_id = Review.objects.get(id=request.POST["id"])
-        badData, created = Goodbad.objects.get_or_create(
-            owner=review_id, bad=request.user.id)
-        if created:
-            review_id.countbad += 1
-            review_id.save()
-        return redirect(to='/movieist/')
-
     one_week_ago = datetime.datetime.now() - datetime.timedelta(days=7)
     topicDataOrg = Review.objects.filter(
         datetime__range=[one_week_ago, datetime.datetime.now()]).order_by("-countgood")[:5]
     topicData = (add_review_info(review) for review in topicDataOrg)
+
     searchDataOrg = Review.objects.all().order_by("-countgood")[:5]
     searchData = (add_review_info(review) for review in searchDataOrg)
+
+    rankingDataOrg = Follow.objects.values('owner').annotate(total=Count(
+        'follower')).order_by('-total')[:5]
+    rankingData = (add_ranking_info(request, ranking) for ranking in rankingDataOrg)
+
+    if (request.POST.get('good') or request.POST.get('bad')):
+        goodbadModule.goodbad(request)
+        url = reverse('homepage')
+        return redirect(url)
+
+    if (request.POST.get('follow')):
+        followModule.follow(request)
+        url = reverse('homepage')
+        return redirect(url)
 
     params = {
         'title': 'homepage',
         'topicData': topicData,
         'searchData': searchData,
+        'rankingData': rankingData,
+        'request.user.id': request.user.id,
     }
     return render(request, 'movieist/homepage.html', params)
 
 
 def reviewer_ranking(request):
-    rankingDataOrg = Follow.objects.annotate(count=Count(
-        'follow_set__follower')).order_by('-count')[:15]
-    rankingData = (add_ranking_info(ranking) for ranking in rankingDataOrg)
+    rankingDataOrg = Follow.objects.values('owner').annotate(total=Count(
+        'follower')).order_by('-total')[:15]
+    rankingData = (add_ranking_info(request, ranking) for ranking in rankingDataOrg)
+
+    if (request.POST.get('follow')):
+        followModule.follow(request)
+        url = reverse('reviewer_ranking')
+        return redirect(url)
 
     params = {
         'rankingData': rankingData,
+        'request.user.id': request.user.id,
     }
     return render(request, 'movieist/reviewer_ranking.html', params)
 
 
-def add_ranking_info(ranking):
-    ranking.profile = Profile.objects.filter(user=ranking.owner)
+def add_ranking_info(request, ranking):
+    ranking['profile'] = Profile.objects.filter(user=ranking['owner'])
 
-    ranking.countFollowing = Follow.objects.filter(
-        owner=ranking.owner, following__isnull=False).values('following').count()
-    ranking.countFollower = Follow.objects.filter(
-        owner=ranking.owner, follower__isnull=False).values('follower').count()
+    ranking['countFollowing'] = Follow.objects.filter(
+        owner=ranking['owner'], following__isnull=False).values('following').count()
+    ranking['countFollower'] = Follow.objects.filter(
+        owner=ranking['owner'], follower__isnull=False).values('follower').count()
+
+    reviewedDataOrg = Review.objects.filter(owner=ranking['owner'])
+    ranking['reviewed'] = (add_review_info(review) for review in reviewedDataOrg)
+
+    if (Follow.objects.filter(owner=request.user.id, following=ranking['owner'])):
+        ranking['button'] = "フォロー中"
+    else:
+        ranking['button'] = "フォロー"
 
     return ranking
 
 
 def search(request, genre):
-    if 'good' in request.POST:
-        review_id = Review.objects.get(id=request.POST["id"])
-        goodData, created = Goodbad.objects.get_or_create(
-            owner=review_id, good=request.user.id)
-        if created:
-            review_id.countgood += 1
-            review_id.save()
-        return redirect(to='/movieist/search/' + genre)
-
-    if 'bad' in request.POST:
-        review_id = Review.objects.get(id=request.POST["id"])
-        badData, created = Goodbad.objects.get_or_create(
-            owner=review_id, bad=request.user.id)
-        if created:
-            review_id.countbad += 1
-            review_id.save()
-        return redirect(to='/movieist/search/' + genre)
+    if (request.POST.get('good') or request.POST.get('bad')):
+        goodbadModule.goodbad(request)
+        url = reverse('search', kwargs={'genre': genre})
+        return redirect(url)
 
     if (genre == "allgenre"):
         actionDataOrg = Review.objects.filter(genre="アクション").order_by('-countgood')[:5]
@@ -381,6 +383,20 @@ def search(request, genre):
 
         return render(request, 'movieist/searchgenre.html', params)
 
+    elif (genre == "topic"):
+        one_week_ago = datetime.datetime.now() - datetime.timedelta(days=7)
+        topicDataOrg = Review.objects.filter(
+            datetime__range=[one_week_ago, datetime.datetime.now()]).order_by("-countgood")[:10]
+        topicData = (add_review_info(review) for review in topicDataOrg)
+
+        params = {
+            'genreData': topicData,
+            'genrename': '注目の投稿',
+            'genre': genre,
+        }
+
+        return render(request, 'movieist/searchgenre.html', params)
+
     params = {
         'actionData': actionData,
         'SFData': SFData,
@@ -415,6 +431,21 @@ def add_review_info(review):
     return review
 
 
+def reviewerselect(request):
+    if (request.method == 'POST'):
+        profiles = Profile.objects.filter(user__username__icontains=request.POST['find'])[:10]
+        params = {
+            'profiles': profiles,
+            'form': FindReviewerForm(request.POST),
+        }
+    else:
+        params = {
+            'form': FindReviewerForm(),
+        }
+
+    return render(request, 'movieist/reviewerselect.html', params)
+
+
 def movieselect(request):
     if (request.method == 'POST'):
         msg = request.POST['find']
@@ -423,11 +454,11 @@ def movieselect(request):
 
         params = {
             'res': res,
-            'form': FindForm(request.POST),
+            'form': FindMovieForm(request.POST),
         }
     else:
         params = {
-            'form': FindForm(),
+            'form': FindMovieForm(),
         }
 
     return render(request, 'movieist/movieselect.html', params)
@@ -440,12 +471,18 @@ def overview(request, movie_id):
     reviewDataOrg = Review.objects.filter(movie_id=movie_id)[:10]
     reviewData = (add_review_info(review) for review in reviewDataOrg)
 
+    if (request.POST.get('good') or request.POST.get('bad')):
+        goodbadModule.goodbad(request)
+        url = reverse('overview', kwargs={'movie_id': movie_id})
+        return redirect(url)
+
     params = {
         'title': res['title'],
         'overview': res['overview'],
         'image': image,
-        'form': FindForm(request.POST),
+        'form': FindMovieForm(request.POST),
         'movie_id': movie_id,
+        'reviewDataOrg': reviewDataOrg,
         'reviewData': reviewData,
     }
 
@@ -489,23 +526,10 @@ def profile(request):
     followerData = Follow.objects.filter(
         owner=request.user.id, follower__isnull=False).values('follower').count()
 
-    if 'good' in request.POST:
-        review_id = Review.objects.get(id=request.POST["id"])
-        goodData, created = Goodbad.objects.get_or_create(
-            owner=review_id, good=request.user.id)
-        if created:
-            review_id.countgood += 1
-            review_id.save()
-        return redirect(to='/movieist/profile')
-
-    if 'bad' in request.POST:
-        review_id = Review.objects.get(id=request.POST["id"])
-        badData, created = Goodbad.objects.get_or_create(
-            owner=review_id, bad=request.user.id)
-        if created:
-            review_id.countgood += 1
-            review_id.save()
-        return redirect(to='/movieist/profile')
+    if (request.POST.get('good') or request.POST.get('bad')):
+        goodbadModule.goodbad(request)
+        url = reverse('profile')
+        return redirect(url)
 
     params = {
         'reviewDataOrg': reviewDataOrg,
@@ -535,10 +559,14 @@ def editprofile(request):
     if (request.method == 'POST'):
         profileForm = ProfileForm(request.POST, request.FILES, instance=profileData)
         userForm = UserForm(request.POST, instance=userData)
+
         if profileForm.is_valid() and userForm.is_valid():
             userForm.save()
             profileForm.save()
             return redirect(to='/movieist/profile')
+
+        else:
+            messages.error(request, '入力に誤りがあります。')
 
     params = {
         'profileForm': ProfileForm(instance=profileData),
@@ -557,6 +585,11 @@ def reviewer(request, user_id):
         owner=user_id, following__isnull=False).values('following').count()
     followerData = Follow.objects.filter(
         owner=user_id, follower__isnull=False).values('follower').count()
+
+    if (request.POST.get('good') or request.POST.get('bad')):
+        goodbadModule.goodbad(request)
+        url = reverse('reviewer', kwargs={'user_id': user_id})
+        return redirect(url)
 
     if (Follow.objects.filter(owner=request.user.id, following=user_id)):
         follow = "フォロー中"
@@ -596,54 +629,42 @@ def reviewer(request, user_id):
 
 def following(request, user_id):
     followingDataOrg = Follow.objects.filter(owner=user_id, following__isnull=False)
-    followingData = (following_info(follow) for follow in followingDataOrg)
+    followingData = (following_info(follow, request) for follow in followingDataOrg)
 
-    if (request.method == 'POST'):
-        Follow.objects.filter(owner=user_id, following=request.POST["id"]).delete()
-        Follow.objects.filter(owner=request.POST["id"], follower=user_id).delete()
+    if (request.POST.get('follow')):
+        followModule.follow(request)
         url = reverse('following', kwargs={'user_id': user_id})
         return redirect(url)
 
     params = {
         'followingData': followingData,
         'user_id': user_id,
+        'request.user.id': request.user.id,
     }
 
     return render(request, 'movieist/following.html', params)
 
 
-def following_info(follow):
+def following_info(follow, request):
     profileData = Profile.objects.filter(user=follow.following)
-
     follow.profile = profileData
+
+    if (Follow.objects.filter(owner=request.user.id, following=follow.following)):
+        follow.button = "フォロー中"
+    else:
+        follow.button = "フォロー"
 
     return follow
 
 
 def follower(request, user_id):
     followerDataOrg = Follow.objects.filter(owner=user_id, follower__isnull=False)
-    followerData = (follower_info(follow, user_id, request) for follow in followerDataOrg)
+    followerData = (follower_info(follow, request) for follow in followerDataOrg)
 
-    if (request.method == 'POST'):
-        if (request.POST["id"] == request.user.id):
-            url = reverse('follower', kwargs={'user_id': user_id})
-            return redirect(url)
-
-        elif (Follow.objects.filter(owner=request.user.id, following=request.POST["id"])):
-            Follow.objects.filter(owner=request.user.id, following=request.POST["id"]).delete()
-            Follow.objects.filter(owner=request.POST["id"], follower=request.user.id).delete()
-            url = reverse('follower', kwargs={'user_id': user_id})
-            return redirect(url)
-
-        else:
-            createFollowing = Follow.objects.filter(owner=request.user.id).create(
-                following=request.POST["id"], owner_id=request.user.id)
-            createFollowing.save()
-            createFollower = Follow.objects.filter(owner=request.POST["id"]).create(
-                follower=request.user.id, owner_id=request.POST["id"])
-            createFollower.save()
-            url = reverse('follower', kwargs={'user_id': user_id})
-            return redirect(url)
+    if (request.POST.get('follow')):
+        followModule.follow(request)
+        url = reverse('follower', kwargs={'user_id': user_id})
+        return redirect(url)
 
     params = {
         'followerData': followerData,
@@ -654,7 +675,7 @@ def follower(request, user_id):
     return render(request, 'movieist/follower.html', params)
 
 
-def follower_info(follow, user_id, request):
+def follower_info(follow, request):
     profileData = Profile.objects.filter(user=follow.follower)
     follow.profile = profileData
 
@@ -719,8 +740,8 @@ def add_follow(request):
             follow.owner = user
             number_2 = random.randrange(1, 1000)
             follow.follower = number_2
-            follow.countfollower += 1
             follow.save()
+
         number_3 = random.randrange(2, 10)
         for er in range(1, number_3):
             user = User.objects.get(id=i)
@@ -728,7 +749,6 @@ def add_follow(request):
             follow.owner = user
             number_4 = random.randrange(1, 1000)
             follow.following = number_4
-            follow.countfollowing += 1
             follow.save()
 
 

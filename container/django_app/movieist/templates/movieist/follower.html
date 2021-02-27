@@ -1,77 +1,27 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="ja">
+{% extends 'movieist/base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="{% static 'movieist/css/style.css' %}" />
-    <title>{{page_title}}</title>
-
-</head>
-
-<body>
-    <div class="header">
-        <div class="header-title">
-            <h3>Movieist</h3>
-        </div>
-        <div class="header-list">
-            <ul>
-                <li>注目の映画</li>
-                <li>映画を探す</li>
-                <li>レビュアーランキング</li>
-                <li>レビューする</li>
-            </ul>
-        </div>
-        <div class="header-menu">
-            <img src="" alt="">
-        </div>
-    </div>
-    <div class="main">
-        <div class="container">
-            {% for follow in followerData %}
-            <div class="follower">
-                {% for follower in follow.profile %}
-                <div class="left-box">
-                    <img src="{{follower.userPic.url}}" width="100" height="100" />
-                    <a href="/movieist/reviewer/{{follow.follower}}">{{follower.user.username}}</a>
-                </div>
-                {% endfor %}
-                <div class="right-box">
-                    {% if follow.follower != request.user.id %}
-                    <form action="{% url 'follower' user_id %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="id" value="{{follow.follower}}">
-                        <input type="submit" value="{{follow.button}}">
-                    </form>
-                    {% endif %}
-                </div>
+{% block content %}
+<div class="main">
+    <div class="container">
+        {% for follow in followerData %}
+        <div class="follower">
+            {% for follower in follow.profile %}
+            <div class="left-box">
+                <img src="{{follower.userPic.url}}" width="100" height="100" />
+                <a href="/movieist/reviewer/{{follow.follower}}">{{follower.user.username}}</a>
             </div>
             {% endfor %}
-        </div>
-    </div>
-    <div class="footer">
-        <div class="footer-container">
-            <div class="footer-title">
-                <h3>Movieist></h3>
-                <p>投稿者のおすすめから見つける映画情報サイト >>></p>
-            </div>
-            <div class="footer-sitemap">
-                <ul>
-                    <li>/homePage</li>
-                    <li>/search</li>
-                    <li>/reviewerRanking</li>
-                    <li>/overview</li>
-                </ul>
-                <ul>
-                    <li>/login</li>
-                    <li>/sign up</li>
-                    <li>/profile</li>
-                </ul>
+            <div class="right-box">
+                {% if follow.follower != request.user.id %}
+                <form action="{% url 'follower' user_id %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="follow" value="{{follow.follower}}">
+                    <input type="submit" value="{{follow.button}}">
+                </form>
+                {% endif %}
             </div>
         </div>
+        {% endfor %}
     </div>
-
-</body>
-
-</html>
+</div>
+{% endblock %}

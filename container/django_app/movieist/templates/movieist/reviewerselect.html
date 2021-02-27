@@ -1,0 +1,35 @@
+{% extends 'movieist/base.html' %}
+
+{% block content %}
+<div class="main">
+    <div class="container">
+        <title>レビュアーを選択></title>
+        <div class="select">
+            <div class="form">
+                <form action="{% url 'reviewerselect' %}" method="post">
+                    <table>
+                        {% csrf_token %}
+                        {{form}}
+                        <tr>
+                            <th></th>
+                            <td><input type="submit" value="click"></td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+
+            <div class="result">
+                <div class="result-container">
+                    <div class="reviewer-box">
+                        {% for profile in profiles %}
+                        <img src="{{profile.userPic.url}}">
+                        <a href="/movieist/reviewer/{{profile.user_id}}">{{profile.user.username}}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

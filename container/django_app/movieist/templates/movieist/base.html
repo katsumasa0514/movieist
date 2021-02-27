@@ -1,0 +1,85 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static 'movieist/css/style.css' %}" />
+    <title>{{page_title}}</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://unpkg.com/vue-star-rating@1.7.0/dist/VueStarRating.umd.min.js"></script>
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-title">
+            <h3>Movieist</h3>
+        </div>
+        <div class="header-list">
+            <ul>
+                <li>注目の映画</li>
+                <li>映画を探す</li>
+                <li>レビュアーランキング</li>
+                <li>レビューする</li>
+            </ul>
+        </div>
+        <div class="header-menu">
+            <img src="" alt="">
+        </div>
+    </div>
+    {% block content %}
+    {% endblock %}
+    <div class="footer">
+        <div class="footer-container">
+            <div class="footer-title">
+                <h3>Movieist></h3>
+                <p>投稿者のおすすめから見つける映画情報サイト >>></p>
+            </div>
+            <div class="footer-sitemap">
+                <ul>
+                    <li>/homePage</li>
+                    <li>/search</li>
+                    <li>/reviewerRanking</li>
+                    <li>/overview</li>
+                </ul>
+                <ul>
+                    <li>/login</li>
+                    <li>/sign up</li>
+                    <li>/profile</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        Vue.component("star-rating", VueStarRating.default);
+
+        new Vue({
+            el: "#app",
+            methods: {
+                setRating: function (rating) {
+                    this.rating = "You have Selected: " + rating + " stars";
+                },
+                showCurrentRating: function (rating) {
+                    this.currentRating =
+                        rating === 0
+                            ? this.currentSelectedRating
+                            : "Click to select " + rating + " stars";
+                },
+                setCurrentSelectedRating: function (rating) {
+                    this.currentSelectedRating = "You have Selected: " + rating + " stars";
+                }
+            },
+            data: {
+                rating: "No Rating Selected",
+                currentRating: "No Rating",
+                currentSelectedRating: "No Current Rating",
+                boundRating: 3
+            }
+        });
+    </script>
+
+</body>
+
+</html>

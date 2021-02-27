@@ -54,3 +54,5 @@ class Follow(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='follow_owner')
     following = models.IntegerField(null=True)
     follower = models.IntegerField(null=True)
+    countfollowing = models.IntegerField(default=0)
+    countfollower = models.IntegerField(default=0)

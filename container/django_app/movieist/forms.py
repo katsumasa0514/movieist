@@ -1,8 +1,13 @@
 from django import forms
-from .models import Profile, Review, User
+from .models import Profile, Review
+from django.contrib.auth.models import User
 
 
-class FindForm(forms.Form):
+class FindMovieForm(forms.Form):
+    find = forms.CharField(label='Find', required=False)
+
+
+class FindReviewerForm(forms.Form):
     find = forms.CharField(label='Find', required=False)
 
 
@@ -21,4 +26,4 @@ class ProfileForm(forms.ModelForm):
 class UserForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['username', ]
+        fields = ['username']
