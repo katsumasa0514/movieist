@@ -151,11 +151,12 @@ def homepage(request):
         return redirect(url)
 
     params = {
-        'title': 'homepage',
+        'page_title': 'homepage',
         'topicData': topicData,
         'searchData': searchData,
         'rankingData': rankingData,
         'request.user.id': request.user.id,
+        're': 2,
     }
     return render(request, 'movieist/homepage.html', params)
 
@@ -203,40 +204,40 @@ def search(request, genre):
         return redirect(url)
 
     if (genre == "allgenre"):
-        actionDataOrg = Review.objects.filter(genre="アクション").order_by('-countgood')[:5]
+        actionDataOrg = Review.objects.filter(genre="アクション").order_by('-countgood')[:3]
         actionData = (add_review_info(review) for review in actionDataOrg)
 
-        SFDataOrg = Review.objects.filter(genre="サイエンスフィクション").order_by('-countgood')[:5]
+        SFDataOrg = Review.objects.filter(genre="サイエンスフィクション").order_by('-countgood')[:3]
         SFData = (add_review_info(review) for review in SFDataOrg)
 
-        mysteryDataOrg = Review.objects.filter(genre="謎").order_by('-countgood')[:5]
+        mysteryDataOrg = Review.objects.filter(genre="謎").order_by('-countgood')[:3]
         mysteryData = (add_review_info(review) for review in mysteryDataOrg)
 
-        dramaDataOrg = Review.objects.filter(genre="ドラマ").order_by('-countgood')[:5]
+        dramaDataOrg = Review.objects.filter(genre="ドラマ").order_by('-countgood')[:3]
         dramaData = (add_review_info(review) for review in dramaDataOrg)
 
-        comedyDataOrg = Review.objects.filter(genre="コメディ").order_by('-countgood')[:5]
+        comedyDataOrg = Review.objects.filter(genre="コメディ").order_by('-countgood')[:3]
         comedyData = (add_review_info(review) for review in comedyDataOrg)
 
-        fantasyDataOrg = Review.objects.filter(genre="ファンタジー").order_by('-countgood')[:5]
+        fantasyDataOrg = Review.objects.filter(genre="ファンタジー").order_by('-countgood')[:3]
         fantasyData = (add_review_info(review) for review in fantasyDataOrg)
 
-        animeDataOrg = Review.objects.filter(genre="アニメーション").order_by('-countgood')[:5]
+        animeDataOrg = Review.objects.filter(genre="アニメーション").order_by('-countgood')[:3]
         animeData = (add_review_info(review) for review in animeDataOrg)
 
-        romanceDataOrg = Review.objects.filter(genre="ロマンス").order_by('-countgood')[:5]
+        romanceDataOrg = Review.objects.filter(genre="ロマンス").order_by('-countgood')[:3]
         romanceData = (add_review_info(review) for review in romanceDataOrg)
 
-        adventureDataOrg = Review.objects.filter(genre="アドベンチャー").order_by('-countgood')[:5]
+        adventureDataOrg = Review.objects.filter(genre="アドベンチャー").order_by('-countgood')[:3]
         adventureData = (add_review_info(review) for review in adventureDataOrg)
 
-        crimeDataOrg = Review.objects.filter(genre="犯罪").order_by('-countgood')[:5]
+        crimeDataOrg = Review.objects.filter(genre="犯罪").order_by('-countgood')[:3]
         crimeData = (add_review_info(review) for review in crimeDataOrg)
 
-        horrorDataOrg = Review.objects.filter(genre="ホラー").order_by('-countgood')[:5]
+        horrorDataOrg = Review.objects.filter(genre="ホラー").order_by('-countgood')[:3]
         horrorData = (add_review_info(review) for review in horrorDataOrg)
 
-        documentaryDataOrg = Review.objects.filter(genre="ドキュメンタリー").order_by('-countgood')[:5]
+        documentaryDataOrg = Review.objects.filter(genre="ドキュメンタリー").order_by('-countgood')[:3]
         documentaryData = (add_review_info(review) for review in documentaryDataOrg)
 
     elif (genre == "action"):
@@ -434,10 +435,16 @@ def add_review_info(review):
 def reviewerselect(request):
     if (request.method == 'POST'):
         profiles = Profile.objects.filter(user__username__icontains=request.POST['find'])[:10]
-        params = {
-            'profiles': profiles,
-            'form': FindReviewerForm(request.POST),
-        }
+        if (profiles):
+            params = {
+                'profiles': profiles,
+                'form': FindReviewerForm(request.POST),
+            }
+        else:
+            messages.error(request, '見つかりませんでした。')
+            params = {
+                'form': FindReviewerForm(request.POST),
+            }
     else:
         params = {
             'form': FindReviewerForm(),

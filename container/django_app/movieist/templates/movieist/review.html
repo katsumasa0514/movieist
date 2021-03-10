@@ -1,7 +1,12 @@
 {% extends 'movieist/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/review.css'%}">
+{% endblock %}
 
 {% block content %}
-<div id="app" class="main">
+<div class="main">
     <div class="container">
         <h1>{{title}}</h1>
         <div class="star-rating">

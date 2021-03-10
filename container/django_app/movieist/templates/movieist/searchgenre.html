@@ -1,4 +1,9 @@
 {% extends 'movieist/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/searchgenre.css'%}">
+{% endblock %}
 
 {% block content %}
 <div class="main">
@@ -15,14 +20,14 @@
                     {% for genre in genreData %}
                     <div class="leftBox">
                         <img src="{{genre.image_path}}">
-                        <h3>{{genre.title}}</h3>
+                        <a href="/movieist/overview/{{genre.movie_id}}">{{genre.title}}</a>
                     </div>
                     <div class="rightBox">
                         <div class="userAndEvaluation">
                             {% for user in genre.profile %}
                             <div class="user">
                                 <img src="{{user.userPic.url}}" width="100" height="100" />
-                                <a href="">{{user.user.username}}</a>
+                                <a href="/movieist/reviewer/{{user.user_id}}">{{user.user.username}}</a>
                             </div>
                             {% endfor %}
                             <div class="evaluation">

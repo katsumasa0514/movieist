@@ -1,4 +1,9 @@
 {% extends 'movieist/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/search.css'%}">
+{% endblock %}
 
 {% block content %}
 <div class="main">
@@ -15,14 +20,14 @@
                     {% for action in actionData %}
                     <div class="leftBox">
                         <img src="{{action.image_path}}">
-                        <h3>{{action.title}}</h3>
+                        <a href="/movieist/overview/{{action.movie_id}}">{{action.title}}</a>
                     </div>
                     <div class="rightBox">
                         <div class="userAndEvaluation">
                             {% for user in action.profile %}
                             <div class="user">
                                 <img src="{{user.userPic.url}}" width="100" height="100" />
-                                <a href="">{{user.user.username}}</a>
+                                <a href="/movieist/reviewer/{{user.user_id}}">{{user.user.username}}</a>
                             </div>
                             {% endfor %}
                             <div class="evaluation">
@@ -55,14 +60,14 @@
                     {% for SF in SFData %}
                     <div class="leftBox">
                         <img src="{{SF.image_path}}">
-                        <h3>{{SF.title}}</h3>
+                        <a href="/movieist/overview/{{SF.movie_id}}">{{SF.title}}</a>
                     </div>
                     <div class="rightBox">
                         <div class="userAndEvaluation">
                             {% for user in SF.profile %}
                             <div class="user">
                                 <img src="{{user.userPic.url}}" width="100" height="100" />
-                                <a href="">{{user.user.username}}</a>
+                                <a href="/movieist/reviewer/{{user.user_id}}">{{user.user.username}}</a>
                             </div>
                             {% endfor %}
                             <div class="evaluation">
@@ -95,14 +100,14 @@
                     {% for mystery in mysteryData %}
                     <div class="leftBox">
                         <img src="{{mystery.image_path}}">
-                        <h3>{{mystery.title}}</h3>
+                        <a href="/movieist/overview/{{mystery.movie_id}}">{{mystery.title}}</a>
                     </div>
                     <div class="rightBox">
                         <div class="userAndEvaluation">
                             {% for user in mystery.profile %}
                             <div class="user">
                                 <img src="{{user.userPic.url}}" width="100" height="100" />
-                                <a href="">{{user.user.username}}</a>
+                                <a href="/movieist/reviewer/{{user.user_id}}">{{user.user.username}}</a>
                             </div>
                             {% endfor %}
                             <div class="evaluation">
@@ -135,14 +140,14 @@
                     {% for drama in dramaData %}
                     <div class="leftBox">
                         <img src="{{drama.image_path}}">
-                        <h3>{{drama.title}}</h3>
+                        <a href="/movieist/overview/{{drama.movie_id}}">{{drama.title}}</a>
                     </div>
                     <div class="rightBox">
                         <div class="userAndEvaluation">
                             {% for user in drama.profile %}
                             <div class="user">
                                 <img src="{{user.userPic.url}}" width="100" height="100" />
-                                <a href="">{{user.user.username}}</a>
+                                <a href="/movieist/reviewer/{{user.user_id}}">{{user.user.username}}</a>
                             </div>
                             {% endfor %}
                             <div class="evaluation">
@@ -175,14 +180,14 @@
                     {% for comedy in comedyData %}
                     <div class="leftBox">
                         <img src="{{comedy.image_path}}">
-                        <h3>{{comedy.title}}</h3>
+                        <a href="/movieist/overview/{{comedy.movie_id}}">{{comedy.title}}</a>
                     </div>
                     <div class="rightBox">
                         <div class="userAndEvaluation">
                             {% for user in comedy.profile %}
                             <div class="user">
                                 <img src="{{user.userPic.url}}" width="100" height="100" />
-                                <a href="">{{user.user.username}}</a>
+                                <a href="/movieist/reviewer/{{user.user_id}}">{{user.user.username}}</a>
                             </div>
                             {% endfor %}
                             <div class="evaluation">
@@ -215,14 +220,14 @@
                     {% for fantasy in fantasyData %}
                     <div class="leftBox">
                         <img src="{{fantasy.image_path}}">
-                        <h3>{{fantasy.title}}</h3>
+                        <a href="/movieist/overview/{{fantasy.movie_id}}">{{fantasy.title}}</a>
                     </div>
                     <div class="rightBox">
                         <div class="userAndEvaluation">
                             {% for user in fantasy.profile %}
                             <div class="user">
                                 <img src="{{user.userPic.url}}" width="100" height="100" />
-                                <a href="">{{user.user.username}}</a>
+                                <a href="/movieist/reviewer/{{user.user_id}}">{{user.user.username}}</a>
                             </div>
                             {% endfor %}
                             <div class="evaluation">
@@ -255,14 +260,14 @@
                     {% for anime in animeData %}
                     <div class="leftBox">
                         <img src="{{anime.image_path}}">
-                        <h3>{{anime.title}}</h3>
+                        <a href="/movieist/overview/{{anime.movie_id}}">{{anime.title}}</a>
                     </div>
                     <div class="rightBox">
                         <div class="userAndEvaluation">
                             {% for user in anime.profile %}
                             <div class="user">
                                 <img src="{{user.userPic.url}}" width="100" height="100" />
-                                <a href="">{{user.user.username}}</a>
+                                <a href="/movieist/reviewer/{{user.user_id}}">{{user.user.username}}</a>
                             </div>
                             {% endfor %}
                             <div class="evaluation">
@@ -295,14 +300,14 @@
                     {% for romance in romanceData %}
                     <div class="leftBox">
                         <img src="{{romance.image_path}}">
-                        <h3>{{romance.title}}</h3>
+                        <a href="/movieist/overview/{{romance.movie_id}}">{{romance.title}}</a>
                     </div>
                     <div class="rightBox">
                         <div class="userAndEvaluation">
                             {% for user in romance.profile %}
                             <div class="user">
                                 <img src="{{user.userPic.url}}" width="100" height="100" />
-                                <a href="">{{user.user.username}}</a>
+                                <a href="/movieist/reviewer/{{user.user_id}}">{{user.user.username}}</a>
                             </div>
                             {% endfor %}
                             <div class="evaluation">
@@ -335,14 +340,14 @@
                     {% for adventure in adventureData %}
                     <div class="leftBox">
                         <img src="{{adventure.image_path}}">
-                        <h3>{{adventure.title}}</h3>
+                        <a href="/movieist/overview/{{adventure.movie_id}}">{{adventure.title}}</a>
                     </div>
                     <div class="rightBox">
                         <div class="userAndEvaluation">
                             {% for user in adventure.profile %}
                             <div class="user">
                                 <img src="{{user.userPic.url}}" width="100" height="100" />
-                                <a href="">{{user.user.username}}</a>
+                                <a href="/movieist/reviewer/{{user.user_id}}">{{user.user.username}}</a>
                             </div>
                             {% endfor %}
                             <div class="evaluation">
@@ -375,14 +380,14 @@
                     {% for crime in crimeData %}
                     <div class="leftBox">
                         <img src="{{crime.image_path}}">
-                        <h3>{{crime.title}}</h3>
+                        <a href="/movieist/overview/{{crime.movie_id}}">{{crime.title}}</a>
                     </div>
                     <div class="rightBox">
                         <div class="userAndEvaluation">
                             {% for user in crime.profile %}
                             <div class="user">
                                 <img src="{{user.userPic.url}}" width="100" height="100" />
-                                <a href="">{{user.user.username}}</a>
+                                <a href="/movieist/reviewer/{{user.user_id}}">{{user.user.username}}</a>
                             </div>
                             {% endfor %}
                             <div class="evaluation">
@@ -415,14 +420,14 @@
                     {% for horror in horrorData %}
                     <div class="leftBox">
                         <img src="{{horror.image_path}}">
-                        <h3>{{horror.title}}</h3>
+                        <a href="/movieist/overview/{{horror.movie_id}}">{{horror.title}}</a>
                     </div>
                     <div class="rightBox">
                         <div class="userAndEvaluation">
                             {% for user in horror.profile %}
                             <div class="user">
                                 <img src="{{user.userPic.url}}" width="100" height="100" />
-                                <a href="">{{user.user.username}}</a>
+                                <a href="/movieist/reviewer/{{user.user_id}}">{{user.user.username}}</a>
                             </div>
                             {% endfor %}
                             <div class="evaluation">
@@ -455,14 +460,14 @@
                     {% for documentary in documentaryData %}
                     <div class="leftBox">
                         <img src="{{documentary.image_path}}">
-                        <h3>{{documentary.title}}</h3>
+                        <a href="/movieist/overview/{{documentary.movie_id}}">{{documentary.title}}</a>
                     </div>
                     <div class="rightBox">
                         <div class="userAndEvaluation">
                             {% for user in documentary.profile %}
                             <div class="user">
                                 <img src="{{user.userPic.url}}" width="100" height="100" />
-                                <a href="">{{user.user.username}}</a>
+                                <a href="/movieist/reviewer/{{user.user_id}}">{{user.user.username}}</a>
                             </div>
                             {% endfor %}
                             <div class="evaluation">

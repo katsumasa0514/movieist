@@ -5,81 +5,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="{% static 'movieist/css/style.css' %}" />
     <title>{{page_title}}</title>
+    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css" />
+    <link href="https://fonts.googleapis.com/css?family=Anton" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Noto+Serif+JP" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
     <script src="https://unpkg.com/vue-star-rating@1.7.0/dist/VueStarRating.umd.min.js"></script>
+    <script src="//unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
+    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+    <script src="//unpkg.com/vue@latest/dist/vue.min.js"></script>
+    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
 </head>
 
 <body>
-    <div class="header">
-        <div class="header-title">
-            <h3>Movieist</h3>
+    <div id="app">
+        <div class="header">
+            <template>
+                <b-navbar toggleable="sm" type="dark" variant="dark" style="font-size: calc(9px + 0.50vw);">
+                    <b-navbar-brand>Movieist</b-navbar-brand>
+                    <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+                    <b-collapse id="nav-collapse" is-nav>
+                        <b-navbar-nav class="ml-auto">
+                            <b-nav-item href="/movieist/">ホーム　|</b-nav-item>
+                            <b-nav-item href="/movieist/search/allgenre">レビューランキング　|</b-nav-item>
+                            <b-nav-item href="/movieist/reviewer_ranking">レビュアーランキング　|</b-nav-item>
+                            <b-nav-item href="/movieist/movieselect">レビューする　|</b-nav-item>
+                            <b-nav-item-dropdown text="検索　|" right>
+                                <b-dropdown-item href="/movieist/movieselect">映画を検索</b-dropdown-item>
+                                <b-dropdown-item href="/movieist/reviewerselect">ユーザーを検索</b-dropdown-item>
+                            </b-nav-item-dropdown>
+                            <b-nav-item-dropdown text="ユーザー" right>
+                                <b-dropdown-item href="/movieist/profile">プロフィール</b-dropdown-item>
+                                <b-dropdown-item href="/movieist/accounts/logout/">ログイン/ログアウト</b-dropdown-item>
+                            </b-nav-item-dropdown>
+                        </b-navbar-nav>
+                    </b-collapse>
+                </b-navbar>
+            </template>
         </div>
-        <div class="header-list">
-            <ul>
-                <li>注目の映画</li>
-                <li>映画を探す</li>
-                <li>レビュアーランキング</li>
-                <li>レビューする</li>
-            </ul>
-        </div>
-        <div class="header-menu">
-            <img src="" alt="">
+        {% block content %}
+        {% endblock %}
+
+
+        <div class="footer">
+            <div class="bg-dark text-white">
+                <b-container class="bv-example-row">
+                    <b-row>
+                        <b-col sm="2">
+                            <h4 class="p-3 mb-2">Movieist</h4>
+                        </b-col>
+                        <b-col sm="10">
+                            <b-row>
+                                <b-col sm="6">
+                                    <b-nav vertical class="w-65 ml-auto">
+                                        <b-nav-item class="ml-auto" href="/movieist/">ホーム　|</b-nav-item>
+                                        <b-nav-item class="ml-auto" href="/movieist/search/allgenre">検索　|</b-nav-item>
+                                        <b-nav-item class="ml-auto" href="/movieist/reviewer_ranking">レビュアーランキング　|
+                                        </b-nav-item>
+                                        <b-nav-item class="ml-auto" href="/movieist/movieselect">レビューする　|</b-nav-item>
+                                    </b-nav>
+                                </b-col>
+                                <b-col sm="6">
+                                    <b-nav vertical class="w-65 ml-auto">
+                                        <b-nav-item class="ml-auto" href="/movieist/">プロフィール　|</b-nav-item>
+                                        <b-nav-item class="ml-auto" href="/movieist/">ログイン/ログアウト　|</b-nav-item>
+                                    </b-nav>
+                                </b-col>
+                            </b-row>
+                        </b-col>
+                    </b-row>
+                </b-container>
+            </div>
         </div>
     </div>
-    {% block content %}
-    {% endblock %}
-    <div class="footer">
-        <div class="footer-container">
-            <div class="footer-title">
-                <h3>Movieist></h3>
-                <p>投稿者のおすすめから見つける映画情報サイト >>></p>
-            </div>
-            <div class="footer-sitemap">
-                <ul>
-                    <li>/homePage</li>
-                    <li>/search</li>
-                    <li>/reviewerRanking</li>
-                    <li>/overview</li>
-                </ul>
-                <ul>
-                    <li>/login</li>
-                    <li>/sign up</li>
-                    <li>/profile</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        Vue.component("star-rating", VueStarRating.default);
-
-        new Vue({
-            el: "#app",
-            methods: {
-                setRating: function (rating) {
-                    this.rating = "You have Selected: " + rating + " stars";
-                },
-                showCurrentRating: function (rating) {
-                    this.currentRating =
-                        rating === 0
-                            ? this.currentSelectedRating
-                            : "Click to select " + rating + " stars";
-                },
-                setCurrentSelectedRating: function (rating) {
-                    this.currentSelectedRating = "You have Selected: " + rating + " stars";
-                }
-            },
-            data: {
-                rating: "No Rating Selected",
-                currentRating: "No Rating",
-                currentSelectedRating: "No Current Rating",
-                boundRating: 3
-            }
-        });
-    </script>
 
 </body>
+<script>
+    Vue.component("star-rating", VueStarRating.default);
+
+    new Vue({
+        el: "#app",
+        methods: {
+            setRating: function (rating) {
+                this.rating = "You have Selected: " + rating + " stars";
+            },
+            showCurrentRating: function (rating) {
+                this.currentRating =
+                    rating === 0
+                        ? this.currentSelectedRating
+                        : "Click to select " + rating + " stars";
+            },
+            setCurrentSelectedRating: function (rating) {
+                this.currentSelectedRating = "You have Selected: " + rating + " stars";
+            }
+        },
+
+        data: {
+            rating: "No Rating Selected",
+            currentRating: "No Rating",
+            currentSelectedRating: "No Current Rating",
+            boundRating: 3,
+        }
+    });
+</script>
+
+<style>
+    .read-only span svg {
+        height: calc(10px + 1vw);
+        width: calc(10px + 1vw);
+    }
+</style>
 
 </html>

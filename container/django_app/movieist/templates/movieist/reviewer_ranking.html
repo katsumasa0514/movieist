@@ -1,4 +1,9 @@
 {% extends 'movieist/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/reviewer_ranking.css'%}">
+{% endblock %}
 
 {% block content %}
 <div class="main">
