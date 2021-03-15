@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 import os
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -152,7 +153,7 @@ ACCOUNT_LOGOUT_REDIRECT_URL = '/movieist/accounts/login/'
 
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
-#ACCOUNT_USERNAME_REQUIRED = False
+# ACCOUNT_USERNAME_REQUIRED = False
 
 
 ACCOUNT_EMAIL_VERIFICATION = 'none'

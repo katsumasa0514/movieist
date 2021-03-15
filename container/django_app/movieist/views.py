@@ -137,7 +137,7 @@ def homepage(request):
     searchData = (add_review_info(review) for review in searchDataOrg)
 
     rankingDataOrg = Follow.objects.values('owner').annotate(total=Count(
-        'follower')).order_by('-total')[:5]
+        'follower')).order_by('-total')[:6]
     rankingData = (add_ranking_info(request, ranking) for ranking in rankingDataOrg)
 
     if (request.POST.get('good') or request.POST.get('bad')):
@@ -156,7 +156,7 @@ def homepage(request):
         'searchData': searchData,
         'rankingData': rankingData,
         'request.user.id': request.user.id,
-        're': 2,
+
     }
     return render(request, 'movieist/homepage.html', params)
 
