@@ -19,6 +19,7 @@
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
     <script src="https://cdn.rawgit.com/SSENSE/vue-carousel/6823411d/dist/vue-carousel.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
@@ -49,7 +50,6 @@
         </div>
         {% block content %}
         {% endblock %}
-
 
         <div class="footer">
             <div class="bg-dark text-white">
@@ -115,13 +115,14 @@
             currentSelectedRating: "No Current Rating",
             boundRating: 3,
             toggle: 0,
-            msg: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. ',
+            currentPage: 1
         },
 
         components: {
             'carousel': VueCarousel.Carousel,
             'slide': VueCarousel.Slide
-        },
+        }
+
     });
 
 </script>
@@ -130,6 +131,11 @@
     .footer a {
         color: rgba(255, 255, 255, .5);
         padding: 1vw;
+    }
+
+    .navbar-dark .navbar-toggler {
+        color: rgba(255, 255, 255, .5);
+        border-color: #343a40;
     }
 </style>
 

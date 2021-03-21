@@ -17,6 +17,7 @@ import datetime
 from django.db.models import Count
 from django.contrib import messages
 from .my_modules import goodbadModule, followModule
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 token = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4YjY5ZjBmMGE0NDBiYjc1NmEwMjE0MjEwYzZlZDZjMiIsInN1YiI6IjVmY2FlMWNlMzk0YTg3MDA0MWQ2MDBlNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Y4BNiKaz70SktudaUey9MOHMAbhW6dEqCMqFO8RKN9Y'
@@ -204,229 +205,218 @@ def search(request, genre):
         return redirect(url)
 
     if (genre == "allgenre"):
-        actionDataOrg = Review.objects.filter(genre="アクション").order_by('-countgood')[:3]
-        actionData = (add_review_info(review) for review in actionDataOrg)
+        genreDataOrg = Review.objects.order_by('-countgood')
+        genreData = list((add_review_info(review) for review in genreDataOrg))
 
-        SFDataOrg = Review.objects.filter(genre="サイエンスフィクション").order_by('-countgood')[:3]
-        SFData = (add_review_info(review) for review in SFDataOrg)
-
-        mysteryDataOrg = Review.objects.filter(genre="謎").order_by('-countgood')[:3]
-        mysteryData = (add_review_info(review) for review in mysteryDataOrg)
-
-        dramaDataOrg = Review.objects.filter(genre="ドラマ").order_by('-countgood')[:3]
-        dramaData = (add_review_info(review) for review in dramaDataOrg)
-
-        comedyDataOrg = Review.objects.filter(genre="コメディ").order_by('-countgood')[:3]
-        comedyData = (add_review_info(review) for review in comedyDataOrg)
-
-        fantasyDataOrg = Review.objects.filter(genre="ファンタジー").order_by('-countgood')[:3]
-        fantasyData = (add_review_info(review) for review in fantasyDataOrg)
-
-        animeDataOrg = Review.objects.filter(genre="アニメーション").order_by('-countgood')[:3]
-        animeData = (add_review_info(review) for review in animeDataOrg)
-
-        romanceDataOrg = Review.objects.filter(genre="ロマンス").order_by('-countgood')[:3]
-        romanceData = (add_review_info(review) for review in romanceDataOrg)
-
-        adventureDataOrg = Review.objects.filter(genre="アドベンチャー").order_by('-countgood')[:3]
-        adventureData = (add_review_info(review) for review in adventureDataOrg)
-
-        crimeDataOrg = Review.objects.filter(genre="犯罪").order_by('-countgood')[:3]
-        crimeData = (add_review_info(review) for review in crimeDataOrg)
-
-        horrorDataOrg = Review.objects.filter(genre="ホラー").order_by('-countgood')[:3]
-        horrorData = (add_review_info(review) for review in horrorDataOrg)
-
-        documentaryDataOrg = Review.objects.filter(genre="ドキュメンタリー").order_by('-countgood')[:3]
-        documentaryData = (add_review_info(review) for review in documentaryDataOrg)
-
-    elif (genre == "action"):
-        genreDataOrg = Review.objects.filter(genre="アクション").order_by('-countgood')[:10]
-        genreData = (add_review_info(review) for review in genreDataOrg)
+        page_obj = paginate_queryset(request, genreData, 10)
 
         params = {
-            'genreData': genreData,
+            'genre': genre,
+            'genreData': page_obj.object_list,
+            'page_obj': page_obj,
+        }
+
+        return render(request, 'movieist/search.html', params)
+
+    elif (genre == "action"):
+        genreDataOrg = Review.objects.filter(genre="アクション").order_by('-countgood')
+        genreData = list((add_review_info(review) for review in genreDataOrg))
+
+        page_obj = paginate_queryset(request, genreData, 10)
+
+        params = {
+            'genreData': page_obj.object_list,
+            'page_obj': page_obj,
             'genrename': 'アクション',
             'genre': genre,
         }
 
-        return render(request, 'movieist/searchgenre.html', params)
+        return render(request, 'movieist/search.html', params)
 
     elif (genre == "sf"):
         genreDataOrg = Review.objects.filter(genre="サイエンスフィクション").order_by('-countgood')[:10]
-        genreData = (add_review_info(review) for review in genreDataOrg)
+        genreData = list((add_review_info(review) for review in genreDataOrg))
+
+        page_obj = paginate_queryset(request, genreData, 10)
 
         params = {
-            'genreData': genreData,
+            'genreData': page_obj.object_list,
+            'page_obj': page_obj,
             'genrename': 'SF',
             'genre': genre,
         }
 
-        return render(request, 'movieist/searchgenre.html', params)
+        return render(request, 'movieist/search.html', params)
 
     elif (genre == "mystery"):
-        genreDataOrg = Review.objects.filter(genre="謎").order_by('-countgood')[:10]
-        genreData = (add_review_info(review) for review in genreDataOrg)
+        genreDataOrg = Review.objects.filter(genre="謎").order_by('-countgood')
+        genreData = list((add_review_info(review) for review in genreDataOrg))
+
+        page_obj = paginate_queryset(request, genreData, 10)
 
         params = {
-            'genreData': genreData,
+            'genreData': page_obj.object_list,
+            'page_obj': page_obj,
             'genrename': 'サスペンス',
             'genre': genre,
         }
 
-        return render(request, 'movieist/searchgenre.html', params)
+        return render(request, 'movieist/search.html', params)
 
     elif (genre == "drama"):
-        genreDataOrg = Review.objects.filter(genre="ドラマ").order_by('-countgood')[:10]
-        genreData = (add_review_info(review) for review in genreDataOrg)
+        genreDataOrg = Review.objects.filter(genre="ドラマ").order_by('-countgood')
+        genreData = list((add_review_info(review) for review in genreDataOrg))
+
+        page_obj = paginate_queryset(request, genreData, 10)
 
         params = {
-            'genreData': genreData,
+            'genreData': page_obj.object_list,
+            'page_obj': page_obj,
             'genrename': 'ドラマ',
             'genre': genre,
         }
 
-        return render(request, 'movieist/searchgenre.html', params)
+        return render(request, 'movieist/search.html', params)
 
     elif (genre == "comedy"):
-        genreDataOrg = Review.objects.filter(genre="コメディ").order_by('-countgood')[:10]
-        genreData = (add_review_info(review) for review in genreDataOrg)
+        genreDataOrg = Review.objects.filter(genre="コメディ").order_by('-countgood')
+        genreData = list((add_review_info(review) for review in genreDataOrg))
+
+        page_obj = paginate_queryset(request, genreData, 10)
 
         params = {
-            'genreData': genreData,
+            'genreData': page_obj.object_list,
+            'page_obj': page_obj,
             'genrename': 'コメディ',
             'genre': genre,
         }
 
-        return render(request, 'movieist/searchgenre.html', params)
+        return render(request, 'movieist/search.html', params)
 
     elif (genre == "anime"):
-        genreDataOrg = Review.objects.filter(genre="アニメーション").order_by('-countgood')[:10]
-        genreData = (add_review_info(review) for review in genreDataOrg)
+        genreDataOrg = Review.objects.filter(genre="アニメーション").order_by('-countgood')
+        genreData = list((add_review_info(review) for review in genreDataOrg))
+
+        page_obj = paginate_queryset(request, genreData, 10)
 
         params = {
-            'genreData': genreData,
+            'genreData': page_obj.object_list,
+            'page_obj': page_obj,
             'genrename': 'アニメ',
             'genre': genre,
         }
 
-        return render(request, 'movieist/searchgenre.html', params)
+        return render(request, 'movieist/search.html', params)
 
     elif (genre == "romance"):
-        genreDataOrg = Review.objects.filter(genre="ロマンス").order_by('-countgood')[:10]
-        genreData = (add_review_info(review) for review in genreDataOrg)
+        genreDataOrg = Review.objects.filter(genre="ロマンス").order_by('-countgood')
+        genreData = list((add_review_info(review) for review in genreDataOrg))
+
+        page_obj = paginate_queryset(request, genreData, 10)
 
         params = {
-            'genreData': genreData,
+            'genreData': page_obj.object_list,
+            'page_obj': page_obj,
             'genrename': 'ロマンス',
             'genre': genre,
         }
 
-        return render(request, 'movieist/searchgenre.html', params)
+        return render(request, 'movieist/search.html', params)
 
     elif (genre == "adventure"):
-        genreDataOrg = Review.objects.filter(genre="アドベンチャー").order_by('-countgood')[:10]
-        genreData = (add_review_info(review) for review in genreDataOrg)
+        genreDataOrg = Review.objects.filter(genre="アドベンチャー").order_by('-countgood')
+        genreData = list((add_review_info(review) for review in genreDataOrg))
+
+        page_obj = paginate_queryset(request, genreData, 10)
 
         params = {
-            'genreData': genreData,
+            'genreData': page_obj.object_list,
+            'page_obj': page_obj,
             'genrename': 'アドベンチャー',
             'genre': genre,
         }
 
-        return render(request, 'movieist/searchgenre.html', params)
+        return render(request, 'movieist/search.html', params)
 
     elif (genre == "crime"):
-        genreDataOrg = Review.objects.filter(genre="犯罪").order_by('-countgood')[:10]
-        genreData = (add_review_info(review) for review in genreDataOrg)
+        genreDataOrg = Review.objects.filter(genre="犯罪").order_by('-countgood')
+        genreData = list((add_review_info(review) for review in genreDataOrg))
+
+        page_obj = paginate_queryset(request, genreData, 10)
 
         params = {
-            'genreData': genreData,
+            'genreData': page_obj.object_list,
+            'page_obj': page_obj,
             'genrename': 'クライム',
             'genre': genre,
         }
 
-        return render(request, 'movieist/searchgenre.html', params)
+        return render(request, 'movieist/search.html', params)
 
     elif (genre == "horror"):
-        genreDataOrg = Review.objects.filter(genre="ホラー").order_by('-countgood')[:10]
-        genreData = (add_review_info(review) for review in genreDataOrg)
+        genreDataOrg = Review.objects.filter(genre="ホラー").order_by('-countgood')
+        genreData = list((add_review_info(review) for review in genreDataOrg))
+
+        page_obj = paginate_queryset(request, genreData, 10)
 
         params = {
-            'genreData': genreData,
+            'genreData': page_obj.object_list,
+            'page_obj': page_obj,
             'genrename': 'ホラー',
             'genre': genre,
         }
 
-        return render(request, 'movieist/searchgenre.html', params)
+        return render(request, 'movieist/search.html', params)
 
     elif (genre == "documentary"):
-        genreDataOrg = Review.objects.filter(genre="ドキュメンタリー").order_by('-countgood')[:10]
-        genreData = (add_review_info(review) for review in genreDataOrg)
+        genreDataOrg = Review.objects.filter(genre="ドキュメンタリー").order_by('-countgood')
+        genreData = list((add_review_info(review) for review in genreDataOrg))
+
+        page_obj = paginate_queryset(request, genreData, 10)
 
         params = {
-            'genreData': genreData,
+            'genreData': page_obj.object_list,
+            'page_obj': page_obj,
             'genrename': 'ドキュメンタリー',
             'genre': genre,
         }
 
-        return render(request, 'movieist/searchgenre.html', params)
+        return render(request, 'movieist/search.html', params)
 
     elif (genre == "fantasy"):
-        genreDataOrg = Review.objects.filter(genre="ファンタジー").order_by('-countgood')[:10]
-        genreData = (add_review_info(review) for review in genreDataOrg)
+        genreDataOrg = Review.objects.filter(genre="ファンタジー").order_by('-countgood')
+        genreData = list((add_review_info(review) for review in genreDataOrg))
+
+        page_obj = paginate_queryset(request, genreData, 10)
 
         params = {
-            'genreData': genreData,
+            'genreData': page_obj.object_list,
+            'page_obj': page_obj,
             'genrename': 'ファンタジー',
             'genre': genre,
         }
 
-        return render(request, 'movieist/searchgenre.html', params)
+        return render(request, 'movieist/search.html', params)
 
     elif (genre == "topic"):
         one_week_ago = datetime.datetime.now() - datetime.timedelta(days=7)
-        topicDataOrg = Review.objects.filter(
-            datetime__range=[one_week_ago, datetime.datetime.now()]).order_by("-countgood")[:10]
-        topicData = (add_review_info(review) for review in topicDataOrg)
+        genreDataOrg = Review.objects.filter(
+            datetime__range=[one_week_ago, datetime.datetime.now()]).order_by("-countgood")
+        genreData = list((add_review_info(review) for review in genreDataOrg))
+
+        page_obj = paginate_queryset(request, genreData, 10)
 
         params = {
-            'genreData': topicData,
+            'genreData': page_obj.object_list,
+            'page_obj': page_obj,
             'genrename': '注目の投稿',
             'genre': genre,
         }
 
-        return render(request, 'movieist/searchgenre.html', params)
-
-    params = {
-        'actionData': actionData,
-        'SFData': SFData,
-        'mysteryData': mysteryData,
-        'dramaData': dramaData,
-        'comedyData': comedyData,
-        'fantasyData': fantasyData,
-        'animeData': animeData,
-        'romanceData': romanceData,
-        'adventureData': adventureData,
-        'crimeData': crimeData,
-        'horrorData': horrorData,
-        'documentaryData': documentaryData,
-        'genre': genre,
-    }
-
-    return render(request, 'movieist/search.html', params)
+        return render(request, 'movieist/search.html', params)
 
 
 def add_review_info(review):
-    movie_info = api.get_movie(review.movie_id)
-    image = api.get_movie_images(review.movie_id)
-
-    review.title = movie_info['title']
-    try:
-        review.image_path = f"{api.img_base_url_}{image['posters'][0]['file_path']}"
-    except IndexError:
-        review.image_path = '/media/documents/noimage.jpg'
-
     review.profile = Profile.objects.filter(user=review.owner)
 
     return review
@@ -499,8 +489,13 @@ def overview(request, movie_id):
 @login_required(login_url='/movieist/accounts/login/')
 def review(request, movie_id):
     res = api.get_movie(movie_id)
+    image = api.get_movie_images(movie_id)
     title = res['title']
-    genre_1 = res['genres'][0]['name']
+    genre = res['genres'][0]['name']
+    try:
+        image_path = f"{api.img_base_url_}{image['posters'][0]['file_path']}"
+    except IndexError:
+        image_path = '/media/documents/noimage.jpg'
 
     if (request.method == 'POST'):
         obj = Review()
@@ -511,7 +506,9 @@ def review(request, movie_id):
             review.owner = request.user
             review.movie_id = movie_id
             review.star = star
-            review.genre = genre_1
+            review.genre = genre
+            review.title = title
+            review.image_path = image_path
             review.save()
         return redirect(to='/movieist/profile')
     params = {
@@ -694,6 +691,18 @@ def follower_info(follow, request):
     return follow
 
 
+def paginate_queryset(request, queryset, count):
+    paginator = Paginator(queryset, count)
+    page = request.GET.get('page')
+    try:
+        page_obj = paginator.page(page)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+    return page_obj
+
+
 def add_user(request):
     fake = Faker('ja_JP')
     fake.random.seed(4321)
@@ -720,16 +729,22 @@ def add_csv(request):
         csv_file = csv.reader(form_data)
         for line in csv_file:
             movie_info = api.get_movie(line[0])
+            image = api.get_movie_images(line[0])
             genres = movie_info['genres'][0]['name']
             number = random.randrange(1, 1000)
             numbers = User.objects.get(id=number)
             review = Review()
             review.owner = numbers
             review.movie_id = line[0]
+            review.title = line[1]
             review.commentTitle = line[2]
             review.comment = line[3]
             review.star = line[4]
             review.genre = genres
+            try:
+                review.image_path = f"{api.img_base_url_}{image['posters'][0]['file_path']}"
+            except IndexError:
+                review.image_path = '/media/documents/noimage.jpg'
             review.save()
 
         return render(request, 'movieist/add_csv.html')

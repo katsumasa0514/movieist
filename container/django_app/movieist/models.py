@@ -36,6 +36,8 @@ class Review(models.Model):
     countgood = models.IntegerField(default=0)
     countbad = models.IntegerField(default=0)
     genre = models.CharField(max_length=20)
+    title = models.CharField(max_length=150)
+    image_path = models.CharField(max_length=100)
 
 
 @receiver(post_save, sender=Review)

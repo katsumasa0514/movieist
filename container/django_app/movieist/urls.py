@@ -16,10 +16,10 @@ urlpatterns = [
     path('reviewer/<int:user_id>', views.reviewer, name='reviewer'),
     path('following/<int:user_id>', views.following, name='following'),
     path('follower/<int:user_id>', views.follower, name='follower'),
-    path('add_user', views.add_user, name='add_user'),
     path('reviewer_ranking', views.reviewer_ranking, name='reviewer_ranking'),
     path('reviewerselect', views.reviewerselect, name='reviewerselect'),
 
+    path('add_user', views.add_user, name='add_user'),
     path('add_csv', views.add_csv, name='add_csv'),
     path('add_follow', views.add_follow, name='add_follow'),
     path('add_goodbad', views.add_goodbad, name='add_goodbad'),

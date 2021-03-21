@@ -8,27 +8,71 @@
 {% block content %}
 <div class="main">
     <b-container style="padding: 0 5% 0 5%">
-
-        <div class="searchtitle">
-            <b-row style="padding: 5% 2% 2% 2%;">
-                <b-link href="/movieist/search/allgenre"
-                    style="font-size: calc(13px + 0.7vw); color: #333; font-weight: 700;">
-                    映画を探す >>></b-link>
+        <div>
+            <b-row style="padding: 1vw;">
+                <b-link href="/movieist/movieselect"
+                    style="font-size: calc(7px + 0.7vw); color: #333; font-weight: 700; margin-left: auto;">
+                    タイトルで検索 >>></b-link>
             </b-row>
-            {% for search in searchData %}
+            <b-row style="padding: 1vw;">
+                <h3 style="font-size: calc(17px + 0.7vw); font-weight: 700; margin: 0 auto;">映画を探す</h3>
+            </b-row>
+            <b-row style="padding: 1vw;">
+                <p style="font-size: calc(7px + 0.7vw); margin: 0 auto;">ランキング形式で表示しています。</p>
+            </b-row>
+            <b-row style="padding: 1vw;">
+                <b-col cols="12" style="padding: 0px;">
+                    <h3 style="font-size: calc(7px + 0.7vw); margin: 0px; font-weight: 700;">ジャンルから探す >>></h3>
+                </b-col>
+                <b-col cols="12" style="padding: 0.5vw;">
+                    <b-link href="/movieist/search/action" style="font-size: calc(7px + 0.7vw);">アクション
+                    </b-link>|
+                    <b-link href="/movieist/search/sf" style="font-size: calc(7px + 0.7vw);">SF
+                    </b-link>|
+                    <b-link href="/movieist/search/mystery" style="font-size: calc(7px + 0.7vw);">サスペンス
+                    </b-link>|
+                    <b-link href="/movieist/search/drama" style="font-size: calc(7px + 0.7vw);">ドラマ
+                    </b-link>|
+                    <b-link href="/movieist/search/comedy" style="font-size: calc(7px + 0.7vw);">コメディ
+                    </b-link>|
+                    <b-link href="/movieist/search/anime" style="font-size: calc(7px + 0.7vw);">アニメ
+                    </b-link>|
+                    <b-link href="/movieist/search/romance" style="font-size: calc(7px + 0.7vw);">ロマンス
+                    </b-link>|
+                    <b-link href="/movieist/search/adventure" style="font-size: calc(7px + 0.7vw);">アドベンチャー
+                    </b-link>|
+                    <b-link href="/movieist/search/crime" style="font-size: calc(7px + 0.7vw);">クライム
+                    </b-link>|
+                    <b-link href="/movieist/search/horror" style="font-size: calc(7px + 0.7vw);">ホラー
+                    </b-link>|
+                    <b-link href="/movieist/search/documentary" style="font-size: calc(7px + 0.7vw);">ドキュメンタリー
+                    </b-link>|
+                    <b-link href="/movieist/search/fantasy" style="font-size: calc(7px + 0.7vw);">ファンタジー
+                    </b-link>|
+                    <b-link href="/movieist/search/allgenre" style="font-size: calc(7px + 0.7vw);">オールジャンル
+                    </b-link>|
+                </b-col>
+            </b-row>
+        </div>
+        <div class="genre">
+            {% if genrename %}
+            <b-row style="padding: 1vw;">
+                <h3 style="font-size: calc(17px + 0.7vw); font-weight: 700;">{{genrename}}</h3>
+            </b-row>
+            {% endif %}
+            {% for genre in genreData %}
             <b-card style="padding: 1vw; margin: 1vw;" no-body="true">
                 <b-row>
                     <b-col cols="4" sm="3">
-                        <b-img src="{{search.image_path}}" fluid alt="Responsive image"></b-img>
+                        <b-img src="{{genre.image_path}}" fluid alt="Responsive image"></b-img>
                     </b-col>
                     <b-col cols="12" sm="9">
                         <b-row style="font-size: calc(13px + 0.7vw); padding: 5px 15px;">
-                            <b-link href="/movieist/overview/{{search.movie_id}}"
-                                style="color: #333; font-weight: 700;">
-                                {{search.title}}
+                            <b-link href="/movieist/overview/{{genre.movie_id}}" style="color: #333; font-weight: 700;">
+                                {{genre.title}}
                             </b-link>
                         </b-row>
-                        {% for user in search.profile %}
+                        {% for user in genre.profile %}
                         <b-row>
                             <b-col cols="12">
                                 <b-avatar src="{{user.userPic.url}}" size="calc(40px + 1vw)"></b-avatar>
@@ -40,7 +84,7 @@
                         </b-row>
                         <b-row>
                             <b-col cols="12">
-                                <star-rating :increment="0.5" v-model="{{search.star}}" read-only="true"
+                                <star-rating :increment="0.5" v-model="{{genre.star}}" read-only="true"
                                     class="read-only">
                                 </star-rating>
                             </b-col>
@@ -49,16 +93,16 @@
                             <b-row>
                                 <b-col cols="12">
                                     <h6 style="font-weight: 700; font-size: calc(12px + 0.3vw);">
-                                        {{search.commentTitle}}
+                                        {{genre.commentTitle}}
                                     </h6>
                                 </b-col>
                                 <b-col cols="12" style="font-size: calc(12px + 0.3vw); text-align: center;">
                                     <p v-if="toggle === {{ forloop.counter }}" style="margin: 0px; text-align: left;">
-                                        {{search.comment}}
+                                        {{genre.comment}}
                                     </p>
                                     <p
                                         v-else　style="overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; text-align: left; margin: 0px;">
-                                        {{search.comment}}
+                                        {{genre.comment}}
                                     </p>
                                     <button v-if="toggle === {{ forloop.counter }}" @click="toggleBtn(0)"
                                         style="padding: 0px; border: 0px; background-color: white; font-size: calc(20px + 1vw); height: 0px;">
@@ -78,20 +122,20 @@
                                 <form search="{% url 'homepage' %}" method="post"
                                     style="padding: 2px; text-align: right;">
                                     {% csrf_token %}
-                                    <input type="hidden" name="id" value="{{search.id}}">
+                                    <input type="hidden" name="id" value="{{genre.id}}">
                                     <b-button variant="outline-dark" type="submit" name="good" value="GOOD"
                                         style="padding: 2px 5px 2px 5px;">
                                         <b-icon icon="hand-thumbs-up" aria-hidden="true"></b-icon>
-                                        {{search.countgood}}
+                                        {{genre.countgood}}
                                     </b-button>
                                 </form>
                                 <form search="{% url 'homepage' %}" method="post" style="padding: 2px;">
                                     {% csrf_token %}
-                                    <input type="hidden" name="id" value="{{search.id}}">
+                                    <input type="hidden" name="id" value="{{genre.id}}">
                                     <b-button variant="outline-dark" type="submit" name="bad" value="BAD"
                                         style="padding: 2px 5px 2px 5px;">
                                         <b-icon icon="hand-thumbs-down" aria-hidden="true"></b-icon>
-                                        {{search.countbad}}
+                                        {{genre.countbad}}
                                     </b-button>
                                 </form>
                             </b-col>
@@ -101,82 +145,27 @@
             </b-card>
             {% endfor %}
         </div>
-        <div class="more-search" style="text-align: center; color: #333; padding: 2%;">
-            <b-button href="/movieist/search/allgenre" style="font-size: calc(12px + 0.3vw);">もっと見る ></b-button>
-        </div>
-
-
-
-        <div class="reviewer-ranking">
-            <b-row style="padding: 5% 2% 2% 2%;">
-                <b-link href="/movieist/reviewer_ranking"
-                    style="font-size: calc(13px + 0.7vw); color: #333; font-weight: 700;">
-                    レビュアーランキング >>></b-link>
-            </b-row>
-            <b-row>
-                {% for ranking in rankingData %}
-                {% for profile in ranking.profile %}
-                <b-col md="6" style="padding: 1vw; font-size: calc(12px + 0.3vw);">
-                    <b-card no-body="true" style="height: 100%;">
-                        <b-card-body>
-                            <b-row style="border: 1px black;">
-                                <b-col cols="9" style="padding: 0 1vw;">
-                                    <b-avatar src="{{profile.userPic.url}}" size="calc(40px + 1vw)">
-                                    </b-avatar>
-                                    <b-link href="/movieist/reviewer/{{profile.user_id}}" style="padding: 1vw;">
-                                        {{profile.user.username}}
-                                    </b-link>
-                                </b-col>
-                                <b-col cols="3" style="text-align: center; padding: 0 1vw;">
-                                    <span style="color: rgb(180, 180, 180); font-size: 1vw;">Followers</span>
-                                    <h6>{{ranking.countFollower}}</h6>
-                                </b-col>
-                            </b-row>
-                            <b-row>
-                                <b-col cols="12">
-                                    <span>{{profile.userComment}}</span>
-                                </b-col>
-                            </b-row>
-                            {% if follow.following != request.user.id %}
-                            <b-row>
-                                <b-col cols="12">
-                                    <form action="{% url 'homepage' %}" method="post">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="follow" value="{{profile.user_id}}">
-                                        <input type="submit" value="{{ranking.button}}">
-                                    </form>
-                                </b-col>
-                            </b-row>
+        <b-row align-h="center" style="padding-top: calc(20px + 2vw);">
+            <b-col cols="10">
+                <ul class="pagination">
+                    <carousel :per-page="5" :per-page-custom=[[780,10],[1024,20]] loop="true"
+                        :pagination-enabled="false" :navigation-enabled="true" navigation-prev-label="〈"
+                        navigation-next-label="〉" centerMode="true" style="width: 100%;">
+                        {% for num in page_obj.paginator.page_range %}
+                        <slide>
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><a class="page-link" href="#!"
+                                    style="text-align: center; padding: calc(1px + 0.5vw);">{{ num }}</a></li>
+                            {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}"
+                                    style="text-align: center; padding: calc(1px + 0.5vw);">{{ num }}</a></li>
                             {% endif %}
-                            <b-row>
-                                <b-col cols="12">
-                                    <carousel :per-page="3" :navigation-enabled="true" navigation-prev-label="〈"
-                                        navigation-next-label="〉" loop="true" pagination-padding="6"
-                                        pagination-size="5">
-                                        {% for reviewed in ranking.reviewed %}
-                                        <slide style="padding: 1vw;">
-                                            <img src="{{reviewed.image_path}}" style="max-width: 100%;">
-                                        </slide>
-                                        {% endfor %}
-                                        <slide style="padding: 1vw;">
-                                            <div style="max-width: 100%;"></div>
-                                        </slide>
-                                        <slide style="padding: 1vw;">
-                                            <div style="max-width: 100%;"></div>
-                                        </slide>
-                                    </carousel>
-                                </b-col>
-                            </b-row>
-                        </b-card-body>
-                    </b-card>
-                </b-col>
-                {% endfor %}
-                {% endfor %}
-            </b-row>
-        </div>
-        <div class="more-ranking" style="text-align: center; color: #333; padding: 2%;">
-            <b-button href="/movieist/reviewer_ranking" style="font-size: calc(12px + 0.3vw);">もっと見る ></b-button>
-        </div>
+                        </slide>
+                        {% endfor %}
+                    </carousel>
+                </ul>
+            </b-col>
+        </b-row>
     </b-container>
 
     <!--

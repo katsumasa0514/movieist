@@ -24,14 +24,6 @@
             </div>
         </b-row>
 
-        <template>
-            <div class="hello">
-                <read-more more-str="read more" :text="msg" link="#" less-str="read less" :max-chars="100"></read-more>
-
-        </template>
-
-
-
         <div class="topic">
             <b-row style="padding: 5% 2% 2% 2%;">
                 <b-link href="/movieist/search/topic"
@@ -39,12 +31,12 @@
                     注目の投稿 >>></b-link>
             </b-row>
             {% for topic in topicData %}
-            <b-card style="padding: 1vw;" no-body="true">
+            <b-card style="padding: 1vw; margin: 1vw;" no-body="true">
                 <b-row>
-                    <b-col cols="4" sm="3">
+                    <b-col sm="3">
                         <b-img src="{{topic.image_path}}" fluid alt="Responsive image"></b-img>
                     </b-col>
-                    <b-col cols="12" sm="9">
+                    <b-col sm="9">
                         <b-row style="font-size: calc(13px + 0.7vw); padding: 5px 15px;">
                             <b-link href="/movieist/overview/{{topic.movie_id}}" style="color: #333; font-weight: 700;">
                                 {{topic.title}}
@@ -138,10 +130,10 @@
             {% for search in searchData %}
             <b-card style="padding: 1vw; margin: 1vw;" no-body="true">
                 <b-row>
-                    <b-col cols="4" sm="3">
+                    <b-col sm="3">
                         <b-img src="{{search.image_path}}" fluid alt="Responsive image"></b-img>
                     </b-col>
-                    <b-col cols="12" sm="9">
+                    <b-col sm="9">
                         <b-row style="font-size: calc(13px + 0.7vw); padding: 5px 15px;">
                             <b-link href="/movieist/overview/{{search.movie_id}}"
                                 style="color: #333; font-weight: 700;">
