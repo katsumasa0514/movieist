@@ -14,7 +14,7 @@ import csv
 from io import TextIOWrapper, StringIO
 import random
 import datetime
-from django.db.models import Count
+from django.db.models import Count, Avg, Q
 from django.contrib import messages
 from .my_modules import goodbadModule, followModule
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -68,6 +68,10 @@ class TMDB:
         url = f'{self.base_url_}movie/{movie_id}/images?api_key=8b69f0f0a440bb756a0214210c6ed6c2&include_image_language=en'
         return self._json_by_get_request(url)
 
+    def get_movie_backdrop(self, movie_id, language=None):
+        url = f'{self.base_url_}movie/{movie_id}/images'
+        return self._json_by_get_request(url)
+
     def get_movie_keywords(self, movie_id):
         url = f'{self.base_url_}movie/{movie_id}/keywords'
         return self._json_by_get_request(url)
@@ -116,10 +120,6 @@ class TMDB:
         url = f'{self.base_url_}movie/top_rated'
         return self._json_by_get_request(url)
 
-    def get_upcoming_movies(self, language=None, region=None):
-        url = f'{self.base_url_}movie/upcoming'
-        return self._json_by_get_request(url)
-
     def get_genre_movies(self):
         url = f'{self.base_url_}genre/movie/list?api_key=8b69f0f0a440bb756a0214210c6ed6c2&language=ja'
         return self._json_by_get_request(url)
@@ -164,8 +164,10 @@ def homepage(request):
 
 def reviewer_ranking(request):
     rankingDataOrg = Follow.objects.values('owner').annotate(total=Count(
-        'follower')).order_by('-total')[:15]
-    rankingData = (add_ranking_info(request, ranking) for ranking in rankingDataOrg)
+        'follower')).order_by('-total')
+    rankingData = list((add_ranking_info(request, ranking) for ranking in rankingDataOrg))
+
+    page_obj = paginate_queryset(request, rankingData, 20)
 
     if (request.POST.get('follow')):
         followModule.follow(request)
@@ -173,7 +175,8 @@ def reviewer_ranking(request):
         return redirect(url)
 
     params = {
-        'rankingData': rankingData,
+        'rankingData': page_obj.object_list,
+        'page_obj': page_obj,
         'request.user.id': request.user.id,
     }
     return render(request, 'movieist/reviewer_ranking.html', params)
@@ -189,11 +192,6 @@ def add_ranking_info(request, ranking):
 
     reviewedDataOrg = Review.objects.filter(owner=ranking['owner'])
     ranking['reviewed'] = (add_review_info(review) for review in reviewedDataOrg)
-
-    if (Follow.objects.filter(owner=request.user.id, following=ranking['owner'])):
-        ranking['button'] = "フォロー中"
-    else:
-        ranking['button'] = "フォロー"
 
     return ranking
 
@@ -249,7 +247,7 @@ def search(request, genre):
         return render(request, 'movieist/search.html', params)
 
     elif (genre == "mystery"):
-        genreDataOrg = Review.objects.filter(genre="謎").order_by('-countgood')
+        genreDataOrg = Review.objects.filter(Q(genre="謎") | Q(genre="スリラー")).order_by('-countgood')
         genreData = list((add_review_info(review) for review in genreDataOrg))
 
         page_obj = paginate_queryset(request, genreData, 10)
@@ -264,7 +262,8 @@ def search(request, genre):
         return render(request, 'movieist/search.html', params)
 
     elif (genre == "drama"):
-        genreDataOrg = Review.objects.filter(genre="ドラマ").order_by('-countgood')
+        genreDataOrg = Review.objects.filter(Q(genre="ドラマ") | Q(genre="履歴") | Q(
+            genre="戦争") | Q(genre="音楽") | Q(genre="西洋")).order_by('-countgood')
         genreData = list((add_review_info(review) for review in genreDataOrg))
 
         page_obj = paginate_queryset(request, genreData, 10)
@@ -279,7 +278,8 @@ def search(request, genre):
         return render(request, 'movieist/search.html', params)
 
     elif (genre == "comedy"):
-        genreDataOrg = Review.objects.filter(genre="コメディ").order_by('-countgood')
+        genreDataOrg = Review.objects.filter(
+            Q(genre="コメディ") | Q(genre="ファミリー")).order_by('-countgood')
         genreData = list((add_review_info(review) for review in genreDataOrg))
 
         page_obj = paginate_queryset(request, genreData, 10)
@@ -302,7 +302,7 @@ def search(request, genre):
         params = {
             'genreData': page_obj.object_list,
             'page_obj': page_obj,
-            'genrename': 'アニメ',
+            'genrename': 'アニメーション',
             'genre': genre,
         }
 
@@ -463,10 +463,23 @@ def movieselect(request):
 
 def overview(request, movie_id):
     res = api.get_movie(movie_id)
+    backdrop = api.get_movie_backdrop(movie_id)
     image = api.get_movie_images(movie_id)
+
+    genre = res['genres'][0]['name']
+    release_date = res['release_date']
+    backdrop = backdrop['backdrops']
     image = f"{api.img_base_url_}{image['posters'][0]['file_path']}"
-    reviewDataOrg = Review.objects.filter(movie_id=movie_id)[:10]
+    reviewDataOrg = Review.objects.filter(movie_id=movie_id)
     reviewData = (add_review_info(review) for review in reviewDataOrg)
+    starData = Review.objects.filter(movie_id=movie_id).aggregate(Avg('star'))
+
+    if (genre == "ファミリー"):
+        genre = "コメディ"
+    elif (genre == "スリラー"):
+        genre = "サスペンス"
+    elif (genre == "履歴" or "戦争" or "音楽" or "西洋"):
+        genre = "ドラマ"
 
     if (request.POST.get('good') or request.POST.get('bad')):
         goodbadModule.goodbad(request)
@@ -481,6 +494,10 @@ def overview(request, movie_id):
         'movie_id': movie_id,
         'reviewDataOrg': reviewDataOrg,
         'reviewData': reviewData,
+        'starAvg': starData["star__avg"],
+        'genre': genre,
+        'release_date': release_date,
+        'backdrop': backdrop,
     }
 
     return render(request, 'movieist/overview.html', params)

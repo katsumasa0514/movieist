@@ -249,17 +249,6 @@
                                     <span>{{profile.userComment}}</span>
                                 </b-col>
                             </b-row>
-                            {% if follow.following != request.user.id %}
-                            <b-row>
-                                <b-col cols="12">
-                                    <form action="{% url 'homepage' %}" method="post">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="follow" value="{{profile.user_id}}">
-                                        <input type="submit" value="{{ranking.button}}">
-                                    </form>
-                                </b-col>
-                            </b-row>
-                            {% endif %}
                             <b-row>
                                 <b-col cols="12">
                                     <carousel :per-page="3" :navigation-enabled="true" navigation-prev-label="〈"

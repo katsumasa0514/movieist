@@ -2,53 +2,100 @@
 {% load static %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/reviewer_ranking.css'%}">
+<link rel="stylesheet" href="{% static 'movieist/css/reviewer_ranking.css'%}">
 {% endblock %}
 
 {% block content %}
 <div class="main">
-    <div class="container">
-        <div class="title">
-            <h2>レビュアーランキング></h2>
-            <a href="/movieist/reviewerselect">レビュアーを検索</a>
-        </div>
-        <div class="rankings">
-            {% for ranking in rankingData %}
-            <div class="ranking">
+    <b-container style="padding: 0 5% 0 5%">
+        <div class="reviewer-ranking">
+            <div>
+                <b-row style="padding: 1vw;">
+                    <b-link href="/movieist/reviewerselect"
+                        style="font-size: calc(7px + 0.7vw); color: #333; font-weight: 700; margin-left: auto;">
+                        レビュアーを検索 >>></b-link>
+                </b-row>
+                <b-row style="padding: 1vw;">
+                    <h3 style="font-size: calc(17px + 0.7vw); font-weight: 700; margin: 0 auto;">レビュアーを探す</h3>
+                </b-row>
+                <b-row style="padding: 1vw;">
+                    <p style="font-size: calc(7px + 0.7vw); margin: 0 auto;">ランキング形式で表示しています。</p>
+                </b-row>
+            </div>
+            <b-row style="padding: 5% 2% 2% 2%;">
+                <h3 style="font-size: calc(17px + 0.7vw); font-weight: 700;">レビュアーランキング</h3>
+            </b-row>
+            <b-row>
+                {% for ranking in rankingData %}
                 {% for profile in ranking.profile %}
-                <div class="user-info">
-                    <div class="upside">
-                        <div class="left-box">
-                            <img src="{{profile.userPic.url}}" width="100" height="100" />
-                            <a href="/movieist/reviewer/{{profile.user_id}}">{{profile.user.username}}</a>
-                        </div>
-                        <div class="right-box">
-                            {% if follow.following != request.user.id %}
-                            <form action="{% url 'reviewer_ranking' %}" method="post">
-                                {% csrf_token %}
-                                <input type="hidden" name="follow" value="{{profile.user_id}}">
-                                <input type="submit" value="{{ranking.button}}">
-                            </form>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="downside">
-                        <div class="countFollower">
-                            <h3>follower</h3>
-                            <h3>{{ranking.countFollower}}</h3>
-                        </div>
-                        <p>{{profile.userComment}}</p>
-                    </div>
-                </div>
+                <b-col md="6" style="padding: 1vw; font-size: calc(12px + 0.3vw);">
+                    <b-card no-body="true" style="height: 100%;">
+                        <b-card-body>
+                            <b-row style="border: 1px black;">
+                                <b-col cols="9" style="padding: 0 1vw;">
+                                    <b-avatar src="{{profile.userPic.url}}" size="calc(40px + 1vw)">
+                                    </b-avatar>
+                                    <b-link href="/movieist/reviewer/{{profile.user_id}}" style="padding: 1vw;">
+                                        {{profile.user.username}}
+                                    </b-link>
+                                </b-col>
+                                <b-col cols="3" style="text-align: center; padding: 0 1vw;">
+                                    <span style="color: rgb(180, 180, 180); font-size: 1vw;">Followers</span>
+                                    <h6>{{ranking.countFollower}}</h6>
+                                </b-col>
+                            </b-row>
+                            <b-row>
+                                <b-col cols="12">
+                                    <span>{{profile.userComment}}</span>
+                                </b-col>
+                            </b-row>
+                            <b-row>
+                                <b-col cols="12">
+                                    <carousel :per-page="3" :navigation-enabled="true" navigation-prev-label="〈"
+                                        navigation-next-label="〉" loop="true" pagination-padding="6"
+                                        pagination-size="5">
+                                        {% for reviewed in ranking.reviewed %}
+                                        <slide style="padding: 1vw;">
+                                            <img src="{{reviewed.image_path}}" style="max-width: 100%;">
+                                        </slide>
+                                        {% endfor %}
+                                        <slide style="padding: 1vw;">
+                                            <div style="max-width: 100%;"></div>
+                                        </slide>
+                                        <slide style="padding: 1vw;">
+                                            <div style="max-width: 100%;"></div>
+                                        </slide>
+                                    </carousel>
+                                </b-col>
+                            </b-row>
+                        </b-card-body>
+                    </b-card>
+                </b-col>
                 {% endfor %}
-            </div>
-            {% for reviewed in ranking.reviewed %}
-            <div class="reviewed">
-                <img src="{{reviewed.image_path}}">
-            </div>
-            {% endfor %}
-            {% endfor %}
+                {% endfor %}
+            </b-row>
         </div>
-    </div>
+        <b-row align-h="center" style="padding-top: calc(20px + 2vw);">
+            <b-col cols="10">
+                <ul class="pagination">
+                    <carousel :per-page="5" :per-page-custom=[[780,10],[1024,20]] loop="true"
+                        :pagination-enabled="false" :navigation-enabled="true" navigation-prev-label="〈"
+                        navigation-next-label="〉" centerMode="true" style="width: 100%;">
+                        {% for num in page_obj.paginator.page_range %}
+                        <slide>
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><a class="page-link" href="#!"
+                                    style="text-align: center; padding: calc(1px + 0.5vw);">{{ num }}</a></li>
+                            {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}"
+                                    style="text-align: center; padding: calc(1px + 0.5vw);">{{ num }}</a></li>
+                            {% endif %}
+                        </slide>
+                        {% endfor %}
+                    </carousel>
+                </ul>
+            </b-col>
+        </b-row>
+    </b-container>
 </div>
 {% endblock %}
