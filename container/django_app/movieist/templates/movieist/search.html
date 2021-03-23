@@ -8,7 +8,7 @@
 {% block content %}
 <div class="main">
     <b-container style="padding: 0 5% 0 5%">
-        <div>
+        <div class="page-title">
             <b-row style="padding: 1vw;">
                 <b-link href="/movieist/movieselect"
                     style="font-size: calc(7px + 0.7vw); color: #333; font-weight: 700; margin-left: auto;">
@@ -56,17 +56,17 @@
         </div>
         <div class="genre">
             {% if genrename %}
-            <b-row style="padding: 1vw;">
+            <b-row style="padding: 1vw 1vw 0 1vw;">
                 <h3 style="font-size: calc(17px + 0.7vw); font-weight: 700;">{{genrename}}</h3>
             </b-row>
             {% endif %}
             {% for genre in genreData %}
-            <b-card style="padding: 1vw; margin: 1vw;" no-body="true">
+            <b-card style="padding: 1vw; margin: 1vw; width: 100%;" no-body="true">
                 <b-row>
-                    <b-col cols="4" sm="3">
+                    <b-col sm="3">
                         <b-img src="{{genre.image_path}}" fluid alt="Responsive image"></b-img>
                     </b-col>
-                    <b-col cols="12" sm="9">
+                    <b-col sm="9">
                         <b-row style="font-size: calc(13px + 0.7vw); padding: 5px 15px;">
                             <b-link href="/movieist/overview/{{genre.movie_id}}" style="color: #333; font-weight: 700;">
                                 {{genre.title}}
@@ -80,8 +80,8 @@
                                     style="font-size: calc(12px + 0.3vw); padding: 1vw;">{{user.user.username}}
                                 </b-link>
                             </b-col>
-                            {% endfor %}
                         </b-row>
+                        {% endfor %}
                         <b-row>
                             <b-col cols="12">
                                 <star-rating :increment="0.5" v-model="{{genre.star}}" read-only="true"

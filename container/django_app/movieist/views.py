@@ -471,8 +471,10 @@ def overview(request, movie_id):
     backdrop = backdrop['backdrops']
     image = f"{api.img_base_url_}{image['posters'][0]['file_path']}"
     reviewDataOrg = Review.objects.filter(movie_id=movie_id)
-    reviewData = (add_review_info(review) for review in reviewDataOrg)
+    reviewData = list((add_review_info(review) for review in reviewDataOrg))
     starData = Review.objects.filter(movie_id=movie_id).aggregate(Avg('star'))
+
+    page_obj = paginate_queryset(request, reviewData, 10)
 
     if (genre == "ファミリー"):
         genre = "コメディ"
@@ -493,7 +495,8 @@ def overview(request, movie_id):
         'form': FindMovieForm(request.POST),
         'movie_id': movie_id,
         'reviewDataOrg': reviewDataOrg,
-        'reviewData': reviewData,
+        'reviewData': page_obj.object_list,
+        'page_obj': page_obj,
         'starAvg': starData["star__avg"],
         'genre': genre,
         'release_date': release_date,
@@ -541,11 +544,12 @@ def review(request, movie_id):
 def profile(request):
     profileData = Profile.objects.filter(user=request.user.id)
     reviewDataOrg = Review.objects.filter(owner=request.user.id)
-    reviewData = (add_movie_info(review) for review in reviewDataOrg)
+    reviewData = list((add_movie_info(review) for review in reviewDataOrg))
     followingData = Follow.objects.filter(
         owner=request.user.id, following__isnull=False).values('following').count()
     followerData = Follow.objects.filter(
         owner=request.user.id, follower__isnull=False).values('follower').count()
+    page_obj = paginate_queryset(request, reviewData, 10)
 
     if (request.POST.get('good') or request.POST.get('bad')):
         goodbadModule.goodbad(request)
@@ -555,7 +559,8 @@ def profile(request):
     params = {
         'reviewDataOrg': reviewDataOrg,
         'profileData': profileData,
-        'reviewData': reviewData,
+        'reviewData': page_obj.object_list,
+        'page_obj': page_obj,
         'followingData': followingData,
         'followerData': followerData,
     }
