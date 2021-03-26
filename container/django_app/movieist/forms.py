@@ -17,13 +17,28 @@ class ReviewForm(forms.ModelForm):
         fields = ['commentTitle', 'comment', ]
 
 
+class ProfileImageForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['userPic']
+        labels = {
+            'userPic': 'プロフィール写真',
+        }
+
+
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['userPic', 'userComment', ]
+        fields = ['userComment']
+        labels = {
+            'userComment': 'プロフィール',
+        }
 
 
 class UserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['username']
+        labels = {
+            'username': 'ニックネーム',
+        }

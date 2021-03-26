@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .forms import FindMovieForm, FindReviewerForm, ReviewForm, ProfileForm, UserForm
+from .forms import FindMovieForm, FindReviewerForm, ReviewForm, ProfileForm, UserForm, ProfileImageForm
 from .models import Review, Profile, Follow, Goodbad
 import requests
 import json
@@ -583,20 +583,26 @@ def editprofile(request):
     userData = User.objects.get(id=request.user.id)
 
     if (request.method == 'POST'):
-        profileForm = ProfileForm(request.POST, request.FILES, instance=profileData)
-        userForm = UserForm(request.POST, instance=userData)
-
-        if profileForm.is_valid() and userForm.is_valid():
-            userForm.save()
-            profileForm.save()
+        iform = ProfileImageForm(request.POST, request.FILES, instance=profileData)
+        pform = ProfileForm(request.POST, instance=profileData)
+        uform = UserForm(request.POST, instance=userData)
+        if pform.is_valid() and uform.is_valid() and iform.is_valid():
+            uform.save()
+            pform.save()
+            iform.save()
             return redirect(to='/movieist/profile')
-
         else:
-            messages.error(request, '入力に誤りがあります。')
+            print('失敗')
+    else:
+        iform = ProfileImageForm()
+        pform = ProfileForm(instance=profileData)
+        uform = UserForm(instance=userData)
 
     params = {
-        'profileForm': ProfileForm(instance=profileData),
-        'userForm': UserForm(instance=userData),
+        'pform': pform,
+        'uform': uform,
+        'iform': iform,
+        'profileData': profileData,
     }
 
     return render(request, 'movieist/editprofile.html', params)
@@ -606,11 +612,12 @@ def reviewer(request, user_id):
     profileData = Profile.objects.filter(user=user_id)
     reviewDataOrg = Review.objects.filter(owner=user_id)
 
-    reviewData = (add_movie_info(review) for review in reviewDataOrg)
+    reviewData = list((add_movie_info(review) for review in reviewDataOrg))
     followingData = Follow.objects.filter(
         owner=user_id, following__isnull=False).values('following').count()
     followerData = Follow.objects.filter(
         owner=user_id, follower__isnull=False).values('follower').count()
+    page_obj = paginate_queryset(request, reviewData, 10)
 
     if (request.POST.get('good') or request.POST.get('bad')):
         goodbadModule.goodbad(request)
@@ -642,7 +649,8 @@ def reviewer(request, user_id):
     params = {
         'reviewDataOrg': reviewDataOrg,
         'profileData': profileData,
-        'reviewData': reviewData,
+        'reviewData': page_obj.object_list,
+        'page_obj': page_obj,
         'followingData': followingData,
         'followerData': followerData,
         'user_id': user_id,
