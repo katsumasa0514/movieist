@@ -454,7 +454,12 @@ def movieselect(request):
             'form': FindMovieForm(request.POST),
         }
     else:
+        msg = 'a'
+        res = api.search_movies(msg)
+        defaltRes = res['results']
+
         params = {
+            'defaltRes': defaltRes,
             'form': FindMovieForm(),
         }
 
@@ -469,7 +474,10 @@ def overview(request, movie_id):
     genre = res['genres'][0]['name']
     release_date = res['release_date']
     backdrop = backdrop['backdrops']
-    image = f"{api.img_base_url_}{image['posters'][0]['file_path']}"
+    try:
+        image = f"{api.img_base_url_}{image['posters'][0]['file_path']}"
+    except IndexError:
+        image = f"{api.img_base_url_}{res['poster_path']}"
     reviewDataOrg = Review.objects.filter(movie_id=movie_id)
     reviewData = list((add_review_info(review) for review in reviewDataOrg))
     starData = Review.objects.filter(movie_id=movie_id).aggregate(Avg('star'))
@@ -501,6 +509,7 @@ def overview(request, movie_id):
         'genre': genre,
         'release_date': release_date,
         'backdrop': backdrop,
+        'request.user.id': request.user.id,
     }
 
     return render(request, 'movieist/overview.html', params)

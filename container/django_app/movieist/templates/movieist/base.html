@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" style="height: 100%;">
 
 <head>
     <meta charset="UTF-8">
@@ -23,7 +23,7 @@
 </head>
 
 <body>
-    <div id="app">
+    <div id="app" style="height: 100%;">
         <div class="header">
             <template>
                 <b-navbar toggleable="md" type="dark" variant="dark" style="font-size: calc(9px + 0.50vw);">
@@ -140,6 +140,10 @@
     .navbar-dark .navbar-toggler {
         color: rgba(255, 255, 255, .5);
         border-color: #343a40;
+    }
+
+    body {
+        height: 100%;
     }
 </style>
 

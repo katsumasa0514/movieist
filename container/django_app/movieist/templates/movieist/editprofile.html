@@ -51,7 +51,13 @@
                     </b-col>
                     <b-col sm="8" style="font-size: calc(12px + 0.3vw); padding: 1vw;">
                         <p style="width: 100%;">{{ ufield }}</p>
-                        <p>{{ ufield.errors }}</p>
+                        {% if ufield.errors %}
+                        <p style="font-size: calc(9px + 0.3vw); color: #e12727; ">・有効なユーザー名を入力してください。全角、半角、@/./+/-/_
+                            を使用できます。</p>
+                        {% else %}
+                        <p style="font-size: calc(9px + 0.3vw);">この項目は必須です。全角、半角、@/./+/-/_
+                            で150文字以下にしてください。文字数制限は15文字以内です。</p>
+                        {% endif %}
                     </b-col>
                 </b-row>
                 {% endfor %}

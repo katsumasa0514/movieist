@@ -1,36 +1,57 @@
 {% extends 'movieist/base.html' %}
 {% load static %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'movieist/css/movieselect.css'%}">
+{% endblock %}
+
 {% block content %}
 <div class="main">
-    <div class="container">
-        <h2>映画を選択></h2>
-        <div class="select">
-            <div class="form">
-                <form action="{% url 'movieselect' %}" method="post">
-                    <table>
+    <b-container style="padding: 0 5% 0 5%">
+        <div class="page-top">
+            <b-row align-h="end" style="padding: 1vw;">
+                <b-col cols="12" style="padding: 1vw;">
+                    <h3 style="font-size: calc(17px + 0.7vw); font-weight: 700;">映画を検索 >>>
+                    </h3>
+                </b-col>
+                <b-col cols="12">
+                    <form action="{% url 'movieselect' %}" method="post" style="height: 100%;">
                         {% csrf_token %}
-                        {{form}}
-                        <tr>
-                            <th></th>
-                            <td><input type="submit" value="click"></td>
-                        </tr>
-                    </table>
-                </form>
-            </div>
-
-            <div class="result">
-                <div class="result-container">
-                    <div class="movie-box">
-                        {% for i in res %}
-                        <img src=https://image.tmdb.org/t/p/w500{{i.poster_path}}>
-                        <a href="overview/{{i.id}}">{{i.title}}</a>
+                        {% for field in form %}
+                        <div style="width: 100%; height: 100%;">
+                            <b-button type="submit" style="font-size: calc(10px + 0.5vw); float: right;">検索</b-button>
+                            {{ field }}
+                        </div>
                         {% endfor %}
-                    </div>
-                </div>
-            </div>
-
+                    </form>
+                </b-col>
+            </b-row>
         </div>
-    </div>
+        <b-row style="padding: 1vw;">
+            <b-card no-body="true" style="padding: 1vw; width: 100%;">
+                <b-row>
+                    {% if res %}
+                    {% for i in res %}
+                    <b-col cols="6" sm="3" style="margin-bottom: 15px;">
+                        <a href="overview/{{i.id}}" style="color: black;">
+                            <img src=https://image.tmdb.org/t/p/w500{{i.poster_path}} style="width: 100%;">
+                            {{i.title}}
+                        </a>
+                    </b-col>
+                    {% endfor %}
+                    {% else %}
+                    {% for i in defaltRes %}
+                    <b-col cols="6" sm="3" style="margin-bottom: 15px;">
+                        <a href="overview/{{i.id}}" style="color: black;">
+                            <img src=https://image.tmdb.org/t/p/w500{{i.poster_path}} style="width: 100%;">
+                            {{i.title}}
+                        </a>
+                    </b-col>
+                    {% endfor %}
+                    {% endif %}
+                </b-row>
+            </b-card>
+        </b-row>
+    </b-container>
 </div>
 {% endblock %}
