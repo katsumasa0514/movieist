@@ -131,10 +131,10 @@ api = TMDB(token)
 def homepage(request):
     one_week_ago = datetime.datetime.now() - datetime.timedelta(days=7)
     topicDataOrg = Review.objects.filter(
-        datetime__range=[one_week_ago, datetime.datetime.now()]).order_by("-countgood")[:5]
+        datetime__range=[one_week_ago, datetime.datetime.now()]).order_by("-countgood")[:6]
     topicData = (add_review_info(review) for review in topicDataOrg)
 
-    searchDataOrg = Review.objects.all().order_by("-countgood")[:5]
+    searchDataOrg = Review.objects.all().order_by("-countgood")[:6]
     searchData = (add_review_info(review) for review in searchDataOrg)
 
     rankingDataOrg = Follow.objects.values('owner').annotate(total=Count(
@@ -424,7 +424,7 @@ def add_review_info(review):
 
 def reviewerselect(request):
     if (request.method == 'POST'):
-        profiles = Profile.objects.filter(user__username__icontains=request.POST['find'])[:10]
+        profiles = Profile.objects.filter(user__username__icontains=request.POST['find'])
         if (profiles):
             params = {
                 'profiles': profiles,
@@ -587,6 +587,7 @@ def add_movie_info(review):
     return review
 
 
+@login_required(login_url='/movieist/accounts/login/')
 def editprofile(request):
     profileData = Profile.objects.get(user=request.user.id)
     userData = User.objects.get(id=request.user.id)
@@ -693,9 +694,9 @@ def following_info(follow, request):
     follow.profile = profileData
 
     if (Follow.objects.filter(owner=request.user.id, following=follow.following)):
-        follow.button = "フォロー中"
+        follow.button = "following"
     else:
-        follow.button = "フォロー"
+        follow.button = "follow"
 
     return follow
 
@@ -723,9 +724,9 @@ def follower_info(follow, request):
     follow.profile = profileData
 
     if (Follow.objects.filter(owner=request.user.id, following=follow.follower)):
-        follow.button = "フォロー中"
+        follow.button = "following"
     else:
-        follow.button = "フォロー"
+        follow.button = "follow"
 
     return follow
 

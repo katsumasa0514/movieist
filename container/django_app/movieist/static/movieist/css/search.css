@@ -1,6 +1,6 @@
 .read-only span svg {
-    height: calc(10px + 1vw);
-    width: calc(10px + 1vw);
+    height: 20px;
+    width: 20px;
 }
 
 .VueCarousel-navigation-next {
@@ -16,8 +16,12 @@
 }
 
 .vue-star-rating-rating-text{
-    font-size: calc(17px + 1vw);
+    font-size: 20px;
     color: gold;
+}
+
+.vue-star-rating-rating-text{
+    height: 24px;
 }
 
 .page-title{
@@ -27,4 +31,8 @@
     padding-right: calc(50vw - 50%);
     padding-left: calc(50vw - 50%);
     border-bottom: 1px solid rgb(223, 223, 223);
+}
+
+.vue-star-rating{
+    padding: 0.3vw 0 0.5vw 0;
 }

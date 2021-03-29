@@ -66,91 +66,102 @@
                     </carousel>
                 </b-col>
             </b-row>
-            <b-row align-h="center">
-                <b-col md="10">
-                    <h3 style="font-size: calc(20px + 0.5vw); color: #333; font-weight: 700; padding: 2vw 2vw 0 2vw;">
-                        レビュー
-                    </h3>
+            <h3 style="font-size: calc(20px + 0.5vw); color: #333; font-weight: 700; padding: 2vw 2vw 0 2vw;">
+                レビュー
+            </h3>
+
+            <b-card style="padding: 1vw; background-color: #eee;">
+                <b-row>
                     {% for genre in reviewData %}
-                    <b-card style="padding:1vw; margin: 1vw;" no-body="true">
-                        {% for user in genre.profile %}
-                        <b-row>
-                            <b-col cols="12">
-                                <b-avatar src="{{user.userPic.url}}" size="calc(40px + 1vw)"></b-avatar>
-                                {% if user.user_id == request.user.id%}
-                                <b-link href="/movieist/profile" style="font-size: calc(12px + 0.3vw); padding: 1vw;">
-                                    {{user.user.username}}
-                                </b-link>
-                                {% else %}
-                                <b-link href="/movieist/reviewer/{{user.user_id}}"
-                                    style="font-size: calc(12px + 0.3vw); padding: 1vw;">{{user.user.username}}
-                                </b-link>
-                                {% endif %}
-                            </b-col>
-                        </b-row>
-                        {% endfor %}
-                        <b-row>
-                            <b-col cols="12">
-                                <star-rating :increment="0.5" v-model="{{genre.star}}" read-only="true"
-                                    class="read-only">
-                                </star-rating>
-                            </b-col>
-                        </b-row>
-                        <b-card no-body="true" style="padding: 1vw;">
+                    <b-col lg="6" style="padding: 0.5vw; height: 100%;">
+                        <b-card>
                             <b-row>
                                 <b-col cols="12">
-                                    <h6 style="font-weight: 700; font-size: calc(12px + 0.3vw);">
-                                        {{genre.commentTitle}}
-                                    </h6>
-                                </b-col>
-                                <b-col cols="12" style="font-size: calc(12px + 0.3vw); text-align: center;">
-                                    <p v-if="toggle === {{ forloop.counter }}" style="margin: 0px; text-align: left;">
-                                        {{genre.comment}}
-                                    </p>
-                                    <p
-                                        v-else　style="overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; text-align: left; margin: 0px;">
-                                        {{genre.comment}}
-                                    </p>
-                                    <button v-if="toggle === {{ forloop.counter }}" @click="toggleBtn(0)"
-                                        style="padding: 0px; border: 0px; background-color: white; font-size: calc(20px + 1vw); height: 0px;">
-                                        <b-icon icon="chevron-compact-up" aria-hidden="true">
-                                        </b-icon>
-                                    </button>
-                                    <button v-else @click="toggleBtn({{ forloop.counter }})"
-                                        style="padding: 0px; border: 0px; background-color: white; font-size: calc(20px + 1vw); height: 0px;">
-                                        <b-icon icon="chevron-compact-down" aria-hidden="true">
-                                        </b-icon>
-                                    </button>
+                                    {% for user in genre.profile %}
+                                    <b-row style="padding-top: 10px; display: flex; align-items: center;">
+                                        <b-avatar src="{{user.userPic.url}}" size="calc(40px + 1vw)"></b-avatar>
+                                        <b-link href="/movieist/reviewer/{{user.user_id}}"
+                                            style="font-size: calc(12px + 0.3vw); padding-left: 5px;">
+                                            {{user.user.username}}
+                                        </b-link>
+                                    </b-row>
+                                    {% endfor %}
+                                    <b-row>
+                                        <star-rating :increment="0.5" v-model="{{genre.star}}" read-only="true"
+                                            class="read-only">
+                                        </star-rating>
+                                    </b-row>
+                                    <b-row>
+                                        <b-card no-body="true" style="padding: 1vw; width: 100%;">
+                                            <h6
+                                                style="font-weight: 700; font-size: 15px; margin: 0px; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1;">
+                                                {{genre.commentTitle}}
+                                            </h6>
+                                            <div v-if="toggle === {{ forloop.counter }}" cols="12"
+                                                style="font-size: 13px; text-align: center; padding: 5px 0;">
+                                                <p style="margin: 0px; text-align: left;">
+                                                    {{genre.comment}}
+                                                </p>
+                                                <button v-if="toggle === {{ forloop.counter }}" @click="toggleBtn(0)"
+                                                    style="padding: 0px; border: 0px; background-color: white; font-size: calc(20px + 1vw); height: 0px;">
+                                                    <b-icon icon="chevron-compact-up" aria-hidden="true">
+                                                    </b-icon>
+                                                </button>
+                                                <button v-else @click="toggleBtn({{ forloop.counter }})"
+                                                    style="padding: 0px; border: 0px; background-color: white; font-size: calc(20px + 1vw); height: 0px;">
+                                                    <b-icon icon="chevron-compact-down" aria-hidden="true">
+                                                    </b-icon>
+                                                </button>
+                                            </div>
+                                            <div v-else cols="12"
+                                                style="font-size: 13px; text-align: center; padding: 5px 0; height: 150px;">
+                                                <p
+                                                    style="overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; text-align: left; margin: 0px;">
+                                                    {{genre.comment}}
+                                                </p>
+                                                <button v-if="toggle === {{ forloop.counter }}" @click="toggleBtn(0)"
+                                                    style="padding: 0px; border: 0px; background-color: white; font-size: calc(20px + 1vw); height: 0px;">
+                                                    <b-icon icon="chevron-compact-up" aria-hidden="true">
+                                                    </b-icon>
+                                                </button>
+                                                <button v-else @click="toggleBtn({{ forloop.counter }})"
+                                                    style="padding: 0px; border: 0px; background-color: white; font-size: calc(20px + 1vw); height: 0px;">
+                                                    <b-icon icon="chevron-compact-down" aria-hidden="true">
+                                                    </b-icon>
+                                                </button>
+                                            </div>
+                                        </b-card>
+                                    </b-row>
+                                    <b-row>
+                                        <b-col cols="12" style="display: flex;">
+                                            <form genre="{% url 'homepage' %}" method="post"
+                                                style="padding: 2px; text-align: right;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="id" value="{{genre.id}}">
+                                                <b-button variant="outline-dark" type="submit" name="good" value="GOOD"
+                                                    style="padding: 2px 5px 2px 5px; border: 0px;">
+                                                    <b-icon icon="hand-thumbs-up" aria-hidden="true"></b-icon>
+                                                    {{genre.countgood}}
+                                                </b-button>
+                                            </form>
+                                            <form genre="{% url 'homepage' %}" method="post" style="padding: 2px;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="id" value="{{genre.id}}">
+                                                <b-button variant="outline-dark" type="submit" name="bad" value="BAD"
+                                                    style="padding: 2px 5px 2px 5px; border: 0px;">
+                                                    <b-icon icon="hand-thumbs-down" aria-hidden="true"></b-icon>
+                                                    {{genre.countbad}}
+                                                </b-button>
+                                            </form>
+                                        </b-col>
+                                    </b-row>
                                 </b-col>
                             </b-row>
                         </b-card>
-                        <b-row>
-                            <b-col cols="12" style="display: flex;">
-                                <form search="{% url 'homepage' %}" method="post"
-                                    style="padding: 2px; text-align: right;">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="id" value="{{genre.id}}">
-                                    <b-button variant="outline-dark" type="submit" name="good" value="GOOD"
-                                        style="padding: 2px 5px 2px 5px;">
-                                        <b-icon icon="hand-thumbs-up" aria-hidden="true"></b-icon>
-                                        {{genre.countgood}}
-                                    </b-button>
-                                </form>
-                                <form search="{% url 'homepage' %}" method="post" style="padding: 2px;">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="id" value="{{genre.id}}">
-                                    <b-button variant="outline-dark" type="submit" name="bad" value="BAD"
-                                        style="padding: 2px 5px 2px 5px;">
-                                        <b-icon icon="hand-thumbs-down" aria-hidden="true"></b-icon>
-                                        {{genre.countbad}}
-                                    </b-button>
-                                </form>
-                            </b-col>
-                        </b-row>
-                    </b-card>
+                    </b-col>
                     {% endfor %}
-                </b-col>
-            </b-row>
+                </b-row>
+            </b-card>
         </div>
         <b-row align-h="center" style="padding-top: calc(20px + 2vw);">
             <b-col cols="10">

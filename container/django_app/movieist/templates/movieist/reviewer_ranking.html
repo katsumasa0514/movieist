@@ -25,55 +25,57 @@
             <b-row style="padding: 2vw 2vw 0 2vw;">
                 <h3 style="font-size: calc(17px + 0.7vw); font-weight: 700;">レビュアーランキング</h3>
             </b-row>
-            <b-row>
-                {% for ranking in rankingData %}
-                {% for profile in ranking.profile %}
-                <b-col md="6" style="padding: 1vw; font-size: calc(12px + 0.3vw);">
-                    <b-card no-body="true" style="height: 100%;">
-                        <b-card-body>
-                            <b-row style="border: 1px black;">
-                                <b-col cols="9" style="padding: 0 1vw;">
-                                    <b-avatar src="{{profile.userPic.url}}" size="calc(40px + 1vw)">
-                                    </b-avatar>
-                                    <b-link href="/movieist/reviewer/{{profile.user_id}}" style="padding: 1vw;">
-                                        {{profile.user.username}}
-                                    </b-link>
-                                </b-col>
-                                <b-col cols="3" style="text-align: center; padding: 0 1vw;">
-                                    <span style="color: rgb(180, 180, 180); font-size: 1vw;">Followers</span>
-                                    <h6>{{ranking.countFollower}}</h6>
-                                </b-col>
-                            </b-row>
-                            <b-row>
-                                <b-col cols="12">
-                                    <span>{{profile.userComment}}</span>
-                                </b-col>
-                            </b-row>
-                            <b-row>
-                                <b-col cols="12">
-                                    <carousel :per-page="3" :navigation-enabled="true" navigation-prev-label="〈"
-                                        navigation-next-label="〉" loop="true" pagination-padding="6"
-                                        pagination-size="5">
-                                        {% for reviewed in ranking.reviewed %}
-                                        <slide style="padding: 1vw;">
-                                            <img src="{{reviewed.image_path}}" style="max-width: 100%;">
-                                        </slide>
-                                        {% endfor %}
-                                        <slide style="padding: 1vw;">
-                                            <div style="max-width: 100%;"></div>
-                                        </slide>
-                                        <slide style="padding: 1vw;">
-                                            <div style="max-width: 100%;"></div>
-                                        </slide>
-                                    </carousel>
-                                </b-col>
-                            </b-row>
-                        </b-card-body>
-                    </b-card>
-                </b-col>
-                {% endfor %}
-                {% endfor %}
-            </b-row>
+            <b-card style="padding: 1vw; background-color: #eee;">
+                <b-row>
+                    {% for ranking in rankingData %}
+                    {% for profile in ranking.profile %}
+                    <b-col md="6" style="padding: 0.5vw; font-size: calc(12px + 0.3vw);">
+                        <b-card no-body="true" style="height: 100%;">
+                            <b-card-body>
+                                <b-row style="border: 1px black;">
+                                    <b-col cols="9" style="padding: 0 1vw;">
+                                        <b-avatar src="{{profile.userPic.url}}" size="calc(40px + 1vw)">
+                                        </b-avatar>
+                                        <b-link href="/movieist/reviewer/{{profile.user_id}}" style="padding: 1vw;">
+                                            {{profile.user.username}}
+                                        </b-link>
+                                    </b-col>
+                                    <b-col cols="3" style="text-align: center; padding: 0 1vw;">
+                                        <span style="color: rgb(180, 180, 180); font-size: 1vw;">Followers</span>
+                                        <h6>{{ranking.countFollower}}</h6>
+                                    </b-col>
+                                </b-row>
+                                <b-row>
+                                    <b-col cols="12">
+                                        <span>{{profile.userComment}}</span>
+                                    </b-col>
+                                </b-row>
+                                <b-row>
+                                    <b-col cols="12">
+                                        <carousel :per-page="3" :navigation-enabled="true" navigation-prev-label="〈"
+                                            navigation-next-label="〉" loop="true" pagination-padding="6"
+                                            pagination-size="5">
+                                            {% for reviewed in ranking.reviewed %}
+                                            <slide style="padding: 1vw;">
+                                                <img src="{{reviewed.image_path}}" style="max-width: 100%;">
+                                            </slide>
+                                            {% endfor %}
+                                            <slide style="padding: 1vw;">
+                                                <div style="max-width: 100%;"></div>
+                                            </slide>
+                                            <slide style="padding: 1vw;">
+                                                <div style="max-width: 100%;"></div>
+                                            </slide>
+                                        </carousel>
+                                    </b-col>
+                                </b-row>
+                            </b-card-body>
+                        </b-card>
+                    </b-col>
+                    {% endfor %}
+                    {% endfor %}
+                </b-row>
+            </b-card>
         </div>
         <b-row align-h="center" style="padding-top: calc(20px + 2vw);">
             <b-col cols="10">
