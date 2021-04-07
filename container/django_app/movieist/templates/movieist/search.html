@@ -172,10 +172,10 @@
                         <slide>
                             {% if page_obj.number == num %}
                             <li class="page-item active"><a class="page-link" href="#!"
-                                    style="text-align: center; padding: calc(1px + 0.5vw);">{{ num }}</a></li>
+                                    style="text-align: center; padding: calc(1px + 0.5vw) 0;">{{ num }}</a></li>
                             {% else %}
                             <li class="page-item"><a class="page-link" href="?page={{ num }}"
-                                    style="text-align: center; padding: calc(1px + 0.5vw);">{{ num }}</a></li>
+                                    style="text-align: center; padding: calc(1px + 0.5vw) 0;">{{ num }}</a></li>
                             {% endif %}
                         </slide>
                         {% endfor %}

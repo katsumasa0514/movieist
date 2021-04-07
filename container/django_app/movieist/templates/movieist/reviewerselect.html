@@ -27,6 +27,7 @@
                 </b-col>
             </b-row>
         </div>
+        {% if profiles %}
         <b-card style="padding: 1vw; margin: 1vw; width: 100%;">
             <b-row style="padding: 1vw;">
 
@@ -37,54 +38,9 @@
                         style="font-size: calc(10px + 0.5vw);">{{profile.user.username}}</a>
                 </b-col>
                 {% endfor %}
-                {% if messages %}
-                <ul class="messages">
-                    {% for message in messages %}
-                    <li{% if message.tags %} class="{{ message.tags }}" {% endif %}
-                        style="font-size: calc(10px + 0.5vw);">{{ message }}</li>
-                        {% endfor %}
-                </ul>
-                {% endif %}
             </b-row>
         </b-card>
+        {% endif %}
     </b-container>
-    <!--
-    <div class="container">
-        <title>レビュアーを選択></title>
-        <div class="select">
-            <div class="form">
-                <form action="{% url 'reviewerselect' %}" method="post">
-                    <table>
-                        {% csrf_token %}
-                        {{form}}
-                        <tr>
-                            <th></th>
-                            <td><input type="submit" value="click"></td>
-                        </tr>
-                    </table>
-                </form>
-                {% if messages %}
-                <ul class="messages">
-                    {% for message in messages %}
-                    <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
-                        {% endfor %}
-                </ul>
-                {% endif %}
-            </div>
-
-            <div class="result">
-                <div class="result-container">
-                    <div class="reviewer-box">
-                        {% for profile in profiles %}
-                        <img src="{{profile.userPic.url}}">
-                        <a href="/movieist/reviewer/{{profile.user_id}}">{{profile.user.username}}</a>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-    -->
 </div>
 {% endblock %}

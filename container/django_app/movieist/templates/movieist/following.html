@@ -17,7 +17,7 @@
                 {% for following in follow.profile %}
                 <b-col cols="8" style="padding: 1vw;">
                     <b-avatar src="{{following.userPic.url}}" size="calc(40px + 2vw)"></b-avatar>
-                    <a href="/movieist/reviewer/{{follow.follower}}"
+                    <a href="/movieist/reviewer/{{follow.following}}"
                         style="font-size: calc(10px + 0.5vw);">{{following.user.username}}</a>
                 </b-col>
                 {% endfor %}
@@ -25,7 +25,7 @@
                 <b-col cols="4" style="padding: 1vw; text-align: right;">
                     <form action="{% url 'following' user_id %}" method="post">
                         {% csrf_token %}
-                        <input type="hidden" name="follow" value="{{follow.follower}}">
+                        <input type="hidden" name="follow" value="{{follow.following}}">
                         <b-button type="submit" style="font-size: calc(10px + 0.5vw); padding: 0.5vw;">{{follow.button}}
                         </b-button>
                     </form>

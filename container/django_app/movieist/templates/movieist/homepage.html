@@ -7,25 +7,29 @@
 
 {% block content %}
 <div class="main">
-    <b-container style="padding: 0 5% 0 5%">
-        <b-row class="page-title" align-v="end">
-            <div>
-                <b-card overlay img-src="https://picsum.photos/1024/400/?image=41" img-alt="Card Image"
-                    text-variant="white">
-                    <b-card-text style="position: absolute; padding: calc(-50px + 13vw) 0 0 calc(-50px + 11vw);">
-                        <h1 style="font-size: calc(15px + 2vw); font-family: 'Anton', sans-serif; color: white;">
-                            Movieist for
-                            contributor
-                        </h1>
-                        <p style="font-size: calc(1px + 2vw); font-family: 'Noto Serif JP', sans-serif; color: white;">
-                            ユーザーの投稿から観たい映画を見つけるサイト</p>
-                    </b-card-text>
-                </b-card>
-            </div>
-        </b-row>
+    <div
+        style="background-color: black; position: relative; display: flex; justify-content: center; align-items: center; border-top: 1px solid rgb(173, 173, 173);">
+        <div style="position: absolute; z-index: 1; text-align: center;">
+            <h1 style="font-size: calc(10px + 3vw); font-family: 'Anton', sans-serif; color: white;">
+                Movieist for
+                contributor
+            </h1>
+            <p style="font-size: calc(2px + 1vw); font-family: 'Noto Serif JP', sans-serif; color: white; margin: 0px;">
+                ユーザーの投稿から観たいを見つけるユーザーのサイト</p>
+        </div>
+        <carousel :per-page="3" :per-page-custom=[[780,4],[1024,5]] :loop="true" :pagination-enabled="false"
+            :autoplay-timeout="5000" :autoplay="true" :speed="1000" style="width: 100%; opacity: 0.30;">
+            {% for image in backgroundImage %}
+            <slide>
+                <img src="{{image.image_path}}" style="max-width: 100%;">
+            </slide>
+            {% endfor %}
+        </carousel>
+    </div>
 
+    <b-container style="padding: 0 5% 0 5%">
         <div class="topic">
-            <b-row style="padding: 5% 2% 2% 2%;">
+            <b-row style="padding: 5% 0 2% 0; width: 100%; margin: 0px;">
                 <b-link href="/movieist/search/topic"
                     style="font-size: calc(13px + 0.7vw); color: #333; font-weight: 700;">
                     注目の投稿 >>></b-link>
@@ -315,18 +319,17 @@
                                 </b-row>
                                 <b-row>
                                     <b-col cols="12">
-                                        <carousel :per-page="3" :navigation-enabled="true" navigation-prev-label="〈"
-                                            navigation-next-label="〉" loop="true" pagination-padding="6"
-                                            pagination-size="5">
+                                        <carousel :per-page="3" :navigation-enabled="true" :pagination-enabled="false"
+                                            navigation-prev-label="〈" navigation-next-label="〉" loop="true">
                                             {% for reviewed in ranking.reviewed %}
-                                            <slide style="padding: 1vw;">
+                                            <slide style="padding: 0.5vw;">
                                                 <img src="{{reviewed.image_path}}" style="max-width: 100%;">
                                             </slide>
                                             {% endfor %}
-                                            <slide style="padding: 1vw;">
+                                            <slide style="padding: 0.5vw;">
                                                 <div style="max-width: 100%;"></div>
                                             </slide>
-                                            <slide style="padding: 1vw;">
+                                            <slide style="padding: 0.5vw;">
                                                 <div style="max-width: 100%;"></div>
                                             </slide>
                                         </carousel>

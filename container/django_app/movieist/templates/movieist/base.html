@@ -19,15 +19,17 @@
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
     <script src="https://cdn.rawgit.com/SSENSE/vue-carousel/6823411d/dist/vue-carousel.min.js"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
     <div id="app" style="height: 100%;">
         <div class="header">
             <template>
-                <b-navbar toggleable="md" type="dark" variant="dark" style="font-size: calc(9px + 0.50vw);">
-                    <b-navbar-brand>Movieist</b-navbar-brand>
+                <b-navbar toggleable="md" type="dark" variant="black"
+                    style="font-size: calc(9px + 0.50vw); background-color: black;">
+                    <b-navbar-brand
+                        style="font-family: 'Anton', sans-serif; font-size: calc(15px + 0.5vw); padding: 0px;">Movieist
+                    </b-navbar-brand>
                     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
                     <b-collapse id="nav-collapse" is-nav>
                         <b-navbar-nav class="ml-auto">
@@ -44,7 +46,8 @@
                             <b-nav-item-dropdown text="ユーザー" right>
                                 <b-dropdown-item href="/movieist/profile" style="font-size: calc(9px + 0.50vw);">プロフィール
                                 </b-dropdown-item>
-                                <b-dropdown-item href="editprofile" style="font-size: calc(9px + 0.50vw);">プロフィール編集
+                                <b-dropdown-item href="/movieist/editprofile" style="font-size: calc(9px + 0.50vw);">
+                                    プロフィール編集
                                 </b-dropdown-item>
                                 <b-dropdown-item href="/movieist/accounts/logout/"
                                     style="font-size: calc(9px + 0.50vw);">ログイン/ログアウト</b-dropdown-item>
@@ -54,15 +57,27 @@
                 </b-navbar>
             </template>
         </div>
+        {% if messages %}
+        <b-alert show dismissible style="margin: 0px; display: flex; justify-content: center; align-items: center;">
+            <ul class="messages" style="margin: 0px;">
+                {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}" {% endif %} style="font-size: calc(10px + 0.5vw);">
+                    {{ message }}</li>
+                    {% endfor %}
+            </ul>
+        </b-alert>
+        {% endif %}
         {% block content %}
         {% endblock %}
 
         <div class="footer">
-            <div class="bg-dark text-white">
+            <div style="background-color: black;">
                 <b-container class="bv-example-row">
                     <b-row style="font-size: calc(12px + 0.3vw);">
                         <b-col sm="2">
-                            <h4 class="p-3 mb-2">Movieist</h4>
+                            <h4 class="p-3 mb-2"
+                                style="font-family: 'Anton', sans-serif; color: white; font-size: calc(20px + 0.5vw);">
+                                Movieist</h4>
                         </b-col>
                         <b-col sm="10">
                             <b-row>
@@ -143,7 +158,7 @@
 
     .navbar-dark .navbar-toggler {
         color: rgba(255, 255, 255, .5);
-        border-color: #343a40;
+        border-color: black;
     }
 
     body {

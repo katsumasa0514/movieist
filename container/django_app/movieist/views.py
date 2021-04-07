@@ -44,80 +44,12 @@ class TMDB:
         url = f'{self.base_url_}movie/{movie_id}?api_key=8b69f0f0a440bb756a0214210c6ed6c2&language=ja&page=1&include_adult=false'
         return self._json_by_get_request(url)
 
-    def get_movie_account_states(self, movie_id):
-        url = f'{self.base_url_}movie/{movie_id}/account_states'
-        return self._json_by_get_request(url)
-
-    def get_movie_alternative_titles(self, movie_id, country=None):
-        url = f'{self.base_url_}movie/{movie_id}/alternative_titles'
-        return self._json_by_get_request(url)
-
-    def get_movie_changes(self, movie_id, start_date=None, end_date=None):
-        url = f'{self.base_url_}movie/{movie_id}'
-        return self._json_by_get_request(url)
-
-    def get_movie_credits(self, movie_id):
-        url = f'{self.base_url_}movie/{movie_id}/credits'
-        return self._json_by_get_request(url)
-
-    def get_movie_external_ids(self, movie_id):
-        url = f'{self.base_url_}movie/{movie_id}/external_ids'
-        return self._json_by_get_request(url)
-
     def get_movie_images(self, movie_id, language=None):
         url = f'{self.base_url_}movie/{movie_id}/images?api_key=8b69f0f0a440bb756a0214210c6ed6c2&include_image_language=en'
         return self._json_by_get_request(url)
 
     def get_movie_backdrop(self, movie_id, language=None):
         url = f'{self.base_url_}movie/{movie_id}/images'
-        return self._json_by_get_request(url)
-
-    def get_movie_keywords(self, movie_id):
-        url = f'{self.base_url_}movie/{movie_id}/keywords'
-        return self._json_by_get_request(url)
-
-    def get_movie_release_dates(self, movie_id):
-        url = f'{self.base_url_}movie/{movie_id}/release_dates'
-        return self._json_by_get_request(url)
-
-    def get_movie_videos(self, movie_id, language=None):
-        url = f'{self.base_url_}movie/{movie_id}/videos'
-        return self._json_by_get_request(url)
-
-    def get_movie_translations(self, movie_id):
-        url = f'{self.base_url_}movie/{movie_id}/translations'
-        return self._json_by_get_request(url)
-
-    def get_movie_recommendations(self, movie_id, language=None):
-        url = f'{self.base_url_}movie/{movie_id}/recommendations'
-        return self._json_by_get_request(url)
-
-    def get_similar_movies(self, movie_id, language=None):
-        url = f'{self.base_url_}movie/{movie_id}/similar'
-        return self._json_by_get_request(url)
-
-    def get_movie_reviews(self, movie_id, language=None):
-        url = f'{self.base_url_}movie/{movie_id}/reviews'
-        return self._json_by_get_request(url)
-
-    def get_movie_lists(self, movie_id, language=None):
-        url = f'{self.base_url_}movie/{movie_id}/lists'
-        return self._json_by_get_request(url)
-
-    def get_latest_movies(self, language=None):
-        url = f'{self.base_url_}movie/latest'
-        return self._json_by_get_request(url)
-
-    def get_now_playing_movies(self, language=None, region=None):
-        url = f'{self.base_url_}movie/now_playing'
-        return self._json_by_get_request(url)
-
-    def get_popular_movies(self, language=None, region=None):
-        url = f'{self.base_url_}movie/popular'
-        return self._json_by_get_request(url)
-
-    def get_top_rated_movies(self, language=None, region=None):
-        url = f'{self.base_url_}movie/top_rated'
         return self._json_by_get_request(url)
 
     def get_genre_movies(self):
@@ -129,6 +61,9 @@ api = TMDB(token)
 
 
 def homepage(request):
+    backgroundImage = Review.objects.exclude(
+        image_path='/media/documents/noimage.jpg').values('image_path').order_by('?')[:50]
+
     one_week_ago = datetime.datetime.now() - datetime.timedelta(days=7)
     topicDataOrg = Review.objects.filter(
         datetime__range=[one_week_ago, datetime.datetime.now()]).order_by("-countgood")[:6]
@@ -157,6 +92,7 @@ def homepage(request):
         'searchData': searchData,
         'rankingData': rankingData,
         'request.user.id': request.user.id,
+        'backgroundImage': backgroundImage,
 
     }
     return render(request, 'movieist/homepage.html', params)
@@ -206,7 +142,7 @@ def search(request, genre):
         genreDataOrg = Review.objects.order_by('-countgood')
         genreData = list((add_review_info(review) for review in genreDataOrg))
 
-        page_obj = paginate_queryset(request, genreData, 10)
+        page_obj = paginate_queryset(request, genreData, 20)
 
         params = {
             'genre': genre,
@@ -220,7 +156,7 @@ def search(request, genre):
         genreDataOrg = Review.objects.filter(genre="アクション").order_by('-countgood')
         genreData = list((add_review_info(review) for review in genreDataOrg))
 
-        page_obj = paginate_queryset(request, genreData, 10)
+        page_obj = paginate_queryset(request, genreData, 20)
 
         params = {
             'genreData': page_obj.object_list,
@@ -232,10 +168,10 @@ def search(request, genre):
         return render(request, 'movieist/search.html', params)
 
     elif (genre == "sf"):
-        genreDataOrg = Review.objects.filter(genre="サイエンスフィクション").order_by('-countgood')[:10]
+        genreDataOrg = Review.objects.filter(genre="サイエンスフィクション").order_by('-countgood')
         genreData = list((add_review_info(review) for review in genreDataOrg))
 
-        page_obj = paginate_queryset(request, genreData, 10)
+        page_obj = paginate_queryset(request, genreData, 20)
 
         params = {
             'genreData': page_obj.object_list,
@@ -250,7 +186,7 @@ def search(request, genre):
         genreDataOrg = Review.objects.filter(Q(genre="謎") | Q(genre="スリラー")).order_by('-countgood')
         genreData = list((add_review_info(review) for review in genreDataOrg))
 
-        page_obj = paginate_queryset(request, genreData, 10)
+        page_obj = paginate_queryset(request, genreData, 20)
 
         params = {
             'genreData': page_obj.object_list,
@@ -266,7 +202,7 @@ def search(request, genre):
             genre="戦争") | Q(genre="音楽") | Q(genre="西洋")).order_by('-countgood')
         genreData = list((add_review_info(review) for review in genreDataOrg))
 
-        page_obj = paginate_queryset(request, genreData, 10)
+        page_obj = paginate_queryset(request, genreData, 20)
 
         params = {
             'genreData': page_obj.object_list,
@@ -282,7 +218,7 @@ def search(request, genre):
             Q(genre="コメディ") | Q(genre="ファミリー")).order_by('-countgood')
         genreData = list((add_review_info(review) for review in genreDataOrg))
 
-        page_obj = paginate_queryset(request, genreData, 10)
+        page_obj = paginate_queryset(request, genreData, 20)
 
         params = {
             'genreData': page_obj.object_list,
@@ -297,7 +233,7 @@ def search(request, genre):
         genreDataOrg = Review.objects.filter(genre="アニメーション").order_by('-countgood')
         genreData = list((add_review_info(review) for review in genreDataOrg))
 
-        page_obj = paginate_queryset(request, genreData, 10)
+        page_obj = paginate_queryset(request, genreData, 20)
 
         params = {
             'genreData': page_obj.object_list,
@@ -312,7 +248,7 @@ def search(request, genre):
         genreDataOrg = Review.objects.filter(genre="ロマンス").order_by('-countgood')
         genreData = list((add_review_info(review) for review in genreDataOrg))
 
-        page_obj = paginate_queryset(request, genreData, 10)
+        page_obj = paginate_queryset(request, genreData, 20)
 
         params = {
             'genreData': page_obj.object_list,
@@ -327,7 +263,7 @@ def search(request, genre):
         genreDataOrg = Review.objects.filter(genre="アドベンチャー").order_by('-countgood')
         genreData = list((add_review_info(review) for review in genreDataOrg))
 
-        page_obj = paginate_queryset(request, genreData, 10)
+        page_obj = paginate_queryset(request, genreData, 20)
 
         params = {
             'genreData': page_obj.object_list,
@@ -342,7 +278,7 @@ def search(request, genre):
         genreDataOrg = Review.objects.filter(genre="犯罪").order_by('-countgood')
         genreData = list((add_review_info(review) for review in genreDataOrg))
 
-        page_obj = paginate_queryset(request, genreData, 10)
+        page_obj = paginate_queryset(request, genreData, 20)
 
         params = {
             'genreData': page_obj.object_list,
@@ -357,7 +293,7 @@ def search(request, genre):
         genreDataOrg = Review.objects.filter(genre="ホラー").order_by('-countgood')
         genreData = list((add_review_info(review) for review in genreDataOrg))
 
-        page_obj = paginate_queryset(request, genreData, 10)
+        page_obj = paginate_queryset(request, genreData, 20)
 
         params = {
             'genreData': page_obj.object_list,
@@ -372,7 +308,7 @@ def search(request, genre):
         genreDataOrg = Review.objects.filter(genre="ドキュメンタリー").order_by('-countgood')
         genreData = list((add_review_info(review) for review in genreDataOrg))
 
-        page_obj = paginate_queryset(request, genreData, 10)
+        page_obj = paginate_queryset(request, genreData, 20)
 
         params = {
             'genreData': page_obj.object_list,
@@ -387,7 +323,7 @@ def search(request, genre):
         genreDataOrg = Review.objects.filter(genre="ファンタジー").order_by('-countgood')
         genreData = list((add_review_info(review) for review in genreDataOrg))
 
-        page_obj = paginate_queryset(request, genreData, 10)
+        page_obj = paginate_queryset(request, genreData, 20)
 
         params = {
             'genreData': page_obj.object_list,
@@ -404,7 +340,7 @@ def search(request, genre):
             datetime__range=[one_week_ago, datetime.datetime.now()]).order_by("-countgood")
         genreData = list((add_review_info(review) for review in genreDataOrg))
 
-        page_obj = paginate_queryset(request, genreData, 10)
+        page_obj = paginate_queryset(request, genreData, 20)
 
         params = {
             'genreData': page_obj.object_list,
@@ -424,14 +360,14 @@ def add_review_info(review):
 
 def reviewerselect(request):
     if (request.method == 'POST'):
-        profiles = Profile.objects.filter(user__username__icontains=request.POST['find'])
+        profiles = Profile.objects.filter(user__username__icontains=request.POST['find'])[:200]
         if (profiles):
             params = {
                 'profiles': profiles,
                 'form': FindReviewerForm(request.POST),
             }
         else:
-            messages.error(request, '見つかりませんでした。')
+            messages.error(request, 'このユーザーは見つかりませんでした。')
             params = {
                 'form': FindReviewerForm(request.POST),
             }
@@ -446,13 +382,24 @@ def reviewerselect(request):
 def movieselect(request):
     if (request.method == 'POST'):
         msg = request.POST['find']
-        res = api.search_movies(msg)
-        res = res['results']
-
-        params = {
-            'res': res,
-            'form': FindMovieForm(request.POST),
-        }
+        if (msg == ""):
+            messages.error(request, 'タイトルを入力してください。')
+            params = {
+                'form': FindReviewerForm(request.POST),
+            }
+        else:
+            res = api.search_movies(msg)
+            if (res['results']):
+                res = res['results']
+                params = {
+                    'res': res,
+                    'form': FindMovieForm(request.POST),
+                }
+            else:
+                messages.error(request, 'このタイトルは見つかりませんでした。')
+                params = {
+                    'form': FindReviewerForm(request.POST),
+                }
     else:
         msg = 'a'
         res = api.search_movies(msg)
@@ -471,13 +418,29 @@ def overview(request, movie_id):
     backdrop = api.get_movie_backdrop(movie_id)
     image = api.get_movie_images(movie_id)
 
-    genre = res['genres'][0]['name']
-    release_date = res['release_date']
-    backdrop = backdrop['backdrops']
+    try:
+        genre = res['genres'][0]['name']
+    except IndexError:
+        genre = "ジャンルがありません"
+
+    try:
+        release_date = res['release_date']
+    except IndexError:
+        release_date = "上映日がありません"
+
+    try:
+        backdrop = backdrop['backdrops']
+    except IndexError:
+        backdrop = " "
+
     try:
         image = f"{api.img_base_url_}{image['posters'][0]['file_path']}"
     except IndexError:
-        image = f"{api.img_base_url_}{res['poster_path']}"
+        if (res['poster_path'] == None):
+            image = "/media/documents/noimage.jpg"
+        else:
+            image = f"{api.img_base_url_}{res['poster_path']}"
+
     reviewDataOrg = Review.objects.filter(movie_id=movie_id)
     reviewData = list((add_review_info(review) for review in reviewDataOrg))
     starData = Review.objects.filter(movie_id=movie_id).aggregate(Avg('star'))
@@ -553,12 +516,11 @@ def review(request, movie_id):
 def profile(request):
     profileData = Profile.objects.filter(user=request.user.id)
     reviewDataOrg = Review.objects.filter(owner=request.user.id)
-    reviewData = list((add_movie_info(review) for review in reviewDataOrg))
     followingData = Follow.objects.filter(
         owner=request.user.id, following__isnull=False).values('following').count()
     followerData = Follow.objects.filter(
         owner=request.user.id, follower__isnull=False).values('follower').count()
-    page_obj = paginate_queryset(request, reviewData, 10)
+    page_obj = paginate_queryset(request, reviewDataOrg, 10)
 
     if (request.POST.get('good') or request.POST.get('bad')):
         goodbadModule.goodbad(request)
@@ -568,23 +530,12 @@ def profile(request):
     params = {
         'reviewDataOrg': reviewDataOrg,
         'profileData': profileData,
-        'reviewData': page_obj.object_list,
         'page_obj': page_obj,
         'followingData': followingData,
         'followerData': followerData,
     }
 
     return render(request, 'movieist/profile.html', params)
-
-
-def add_movie_info(review):
-    movie_info = api.get_movie(review.movie_id)
-    image = api.get_movie_images(review.movie_id)
-
-    review.title = movie_info['title']
-    review.image_path = f"{api.img_base_url_}{image['posters'][0]['file_path']}"
-
-    return review
 
 
 @login_required(login_url='/movieist/accounts/login/')
@@ -622,12 +573,11 @@ def reviewer(request, user_id):
     profileData = Profile.objects.filter(user=user_id)
     reviewDataOrg = Review.objects.filter(owner=user_id)
 
-    reviewData = list((add_movie_info(review) for review in reviewDataOrg))
     followingData = Follow.objects.filter(
         owner=user_id, following__isnull=False).values('following').count()
     followerData = Follow.objects.filter(
         owner=user_id, follower__isnull=False).values('follower').count()
-    page_obj = paginate_queryset(request, reviewData, 10)
+    page_obj = paginate_queryset(request, reviewDataOrg, 10)
 
     if (request.POST.get('good') or request.POST.get('bad')):
         goodbadModule.goodbad(request)
@@ -637,29 +587,28 @@ def reviewer(request, user_id):
     if (Follow.objects.filter(owner=request.user.id, following=user_id)):
         follow = "フォロー中"
         if (request.method == 'POST'):
-            # 自分のフォロー中から相手を削除
             Follow.objects.filter(owner=request.user.id, following=user_id).delete()
-            # 相手のフォロワーから自分を削除
             Follow.objects.filter(owner=user_id, follower=request.user.id).delete()
             url = reverse('reviewer', kwargs={'user_id': user_id})
             return redirect(url)
-
     else:
         follow = "フォロー"
         if (request.method == 'POST'):
-            createFollowing = Follow.objects.filter(owner=request.user.id).create(
-                following=user_id, owner_id=request.user.id)
-            createFollowing.save()
-            createFollower = Follow.objects.filter(owner=user_id).create(
-                follower=request.user.id, owner_id=user_id)
-            createFollower.save()
-            url = reverse('reviewer', kwargs={'user_id': user_id})
-            return redirect(url)
+            if (request.user.id):
+                createFollowing = Follow.objects.filter(owner=request.user.id).create(
+                    following=user_id, owner_id=request.user.id)
+                createFollowing.save()
+                createFollower = Follow.objects.filter(owner=user_id).create(
+                    follower=request.user.id, owner_id=user_id)
+                createFollower.save()
+                url = reverse('reviewer', kwargs={'user_id': user_id})
+                return redirect(url)
+            else:
+                messages.error(request, 'フォローするにはログインが必要です。')
 
     params = {
         'reviewDataOrg': reviewDataOrg,
         'profileData': profileData,
-        'reviewData': page_obj.object_list,
         'page_obj': page_obj,
         'followingData': followingData,
         'followerData': followerData,
@@ -741,98 +690,3 @@ def paginate_queryset(request, queryset, count):
     except EmptyPage:
         page_obj = paginator.page(paginator.num_pages)
     return page_obj
-
-
-def add_user(request):
-    fake = Faker('ja_JP')
-    fake.random.seed(4321)
-
-    names = set()
-    emails = set()
-    while len(names) < 1000:
-
-        len(emails)
-        names.add(fake.name())
-        emails.add(fake.email())
-
-    for (name, email) in zip(names, emails):
-        user, created = User.objects.get_or_create(username=name, email=email)
-        if created:
-            user.set_password('nawa0514')
-            user.save()
-    return user, created
-
-
-def add_csv(request):
-    if 'csv' in request.FILES:
-        form_data = TextIOWrapper(request.FILES['csv'].file, encoding='utf-8')
-        csv_file = csv.reader(form_data)
-        for line in csv_file:
-            movie_info = api.get_movie(line[0])
-            image = api.get_movie_images(line[0])
-            genres = movie_info['genres'][0]['name']
-            number = random.randrange(1, 1000)
-            numbers = User.objects.get(id=number)
-            review = Review()
-            review.owner = numbers
-            review.movie_id = line[0]
-            review.title = line[1]
-            review.commentTitle = line[2]
-            review.comment = line[3]
-            review.star = line[4]
-            review.genre = genres
-            try:
-                review.image_path = f"{api.img_base_url_}{image['posters'][0]['file_path']}"
-            except IndexError:
-                review.image_path = '/media/documents/noimage.jpg'
-            review.save()
-
-        return render(request, 'movieist/add_csv.html')
-
-    else:
-        return render(request, 'movieist/add_csv.html')
-
-
-def add_follow(request):
-    for i in range(1, 1000):
-        number_1 = random.randrange(2, 10)
-        for er in range(1, number_1):
-            user = User.objects.get(id=i)
-            follow = Follow()
-            follow.owner = user
-            number_2 = random.randrange(1, 1000)
-            follow.follower = number_2
-            follow.save()
-
-        number_3 = random.randrange(2, 10)
-        for er in range(1, number_3):
-            user = User.objects.get(id=i)
-            follow = Follow()
-            follow.owner = user
-            number_4 = random.randrange(1, 1000)
-            follow.following = number_4
-            follow.save()
-
-
-def add_goodbad(request):
-    for i in range(1, 778):
-        number_1 = random.randrange(2, 10)
-        for g in range(1, number_1):
-            review_id = Review.objects.get(id=i)
-            goodbad = Goodbad()
-            goodbad.owner = review_id
-            number_2 = random.randrange(1, 1000)
-            goodbad.good = number_2
-            goodbad.save()
-            review_id.countgood += 1
-            review_id.save()
-        number_3 = random.randrange(2, 10)
-        for b in range(1, number_3):
-            review_id = Review.objects.get(id=i)
-            goodbad = Goodbad()
-            goodbad.owner = review_id
-            number_4 = random.randrange(1, 1000)
-            goodbad.bad = number_4
-            goodbad.save()
-            review_id.countbad += 1
-            review_id.save()

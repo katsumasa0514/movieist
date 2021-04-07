@@ -52,18 +52,17 @@
                                 </b-row>
                                 <b-row>
                                     <b-col cols="12">
-                                        <carousel :per-page="3" :navigation-enabled="true" navigation-prev-label="〈"
-                                            navigation-next-label="〉" loop="true" pagination-padding="6"
-                                            pagination-size="5">
+                                        <carousel :per-page="3" :navigation-enabled="true" :pagination-enabled="false"
+                                            navigation-prev-label="〈" navigation-next-label="〉" loop="true">
                                             {% for reviewed in ranking.reviewed %}
-                                            <slide style="padding: 1vw;">
+                                            <slide style="padding: 0.5vw;">
                                                 <img src="{{reviewed.image_path}}" style="max-width: 100%;">
                                             </slide>
                                             {% endfor %}
-                                            <slide style="padding: 1vw;">
+                                            <slide style="padding: 0.5vw;">
                                                 <div style="max-width: 100%;"></div>
                                             </slide>
-                                            <slide style="padding: 1vw;">
+                                            <slide style="padding: 0.5vw;">
                                                 <div style="max-width: 100%;"></div>
                                             </slide>
                                         </carousel>

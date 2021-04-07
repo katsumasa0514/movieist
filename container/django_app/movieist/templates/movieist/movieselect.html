@@ -34,7 +34,11 @@
                     {% for i in res %}
                     <b-col cols="6" sm="3" style="margin-bottom: 15px;">
                         <a href="overview/{{i.id}}" style="color: black;">
+                            {% if i.poster_path == None %}
+                            <img src=/media/documents/noimage.jpg style="width: 100%;">
+                            {% else %}
                             <img src=https://image.tmdb.org/t/p/w500{{i.poster_path}} style="width: 100%;">
+                            {% endif %}
                             {{i.title}}
                         </a>
                     </b-col>

@@ -6,6 +6,10 @@
     font-size: calc(20px + 0.5vw);
 }
 
+.reviewer-ranking .VueCarousel-navigation button{
+    padding: 0px !important;
+}
+
 .main{
     background-color: #fafafa;
 }
