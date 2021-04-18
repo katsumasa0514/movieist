@@ -1,0 +1,43 @@
+.read-only span svg {
+    height: 20px;
+    width: 20px;
+}
+
+.VueCarousel-navigation-next {
+    font-size: calc(20px + 0.5vw);
+}
+
+.VueCarousel-navigation-prev {
+    font-size: calc(20px + 0.5vw);
+}
+
+.reviewer-ranking .VueCarousel-navigation button{
+    padding: 0px !important;
+}
+
+.main{
+    background-color: #fafafa;
+}
+
+.vue-star-rating-rating-text{
+    font-size: 20px;
+    color: gold;
+}
+
+.vue-star-rating-rating-text{
+    height: 24px;
+}
+
+.page-title{
+    position: relative;
+    background-color: black; 
+    margin-right: calc(50% - 50vw);
+    margin-left: calc(50% - 50vw);
+    border-bottom: 1px solid rgb(223, 223, 223);
+    padding: 2vw calc(50vw - 50%) 2vw calc(50vw - 50%);
+    opacity: 0.80;
+}
+
+.vue-star-rating{
+    padding: 0.3vw 0 0.5vw 0;
+}

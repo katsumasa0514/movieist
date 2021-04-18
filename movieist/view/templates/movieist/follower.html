@@ -1,0 +1,40 @@
+{% extends 'movieist/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'movieist/css/follower.css'%}">
+{% endblock %}
+
+{% block content %}
+<div class="main">
+    <b-container style="padding: 0 5% 0 5%">
+        <b-row class="page-title" style="padding: 1vw;">
+            <h3 style="font-size: calc(17px + 0.7vw); font-weight: 700; margin: 0 auto;">follower</h3>
+        </b-row>
+        <b-card style="margin: 1vw 0 1vw 0;">
+            {% for follow in followerData %}
+            <b-row align-v="center">
+                {% for follower in follow.profile %}
+                <b-col cols="8" style="padding: 1vw;">
+                    <b-avatar src="{{follower.userPic.url}}" size="calc(40px + 2vw)"></b-avatar>
+                    <a href="/movieist/reviewer/{{follow.follower}}"
+                        style="font-size: calc(10px + 0.5vw);">{{follower.user.username}}</a>
+                </b-col>
+                {% endfor %}
+                {% if follow.follower != request.user.id %}
+                <b-col cols="4" style="padding: 1vw; text-align: right;">
+                    <form action="{% url 'follower' user_id %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="follow" value="{{follow.follower}}">
+                        <b-button type="submit" style="font-size: calc(10px + 0.5vw); padding: 0.5vw;">{{follow.button}}
+                        </b-button>
+                    </form>
+                </b-col>
+                {% endif %}
+            </b-row>
+            {% endfor %}
+        </b-card>
+
+    </b-container>
+</div>
+{% endblock %}

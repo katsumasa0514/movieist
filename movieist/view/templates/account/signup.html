@@ -1,0 +1,56 @@
+{% extends "movieist/base.html" %}
+
+{% load i18n %}
+
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'movieist/css/signup.css'%}">
+{% endblock %}
+
+{% block content %}
+<div class="main">
+  <b-container style="padding: 0 5% 0 5%">
+    <b-row class="page-title">
+      <b-col cols="12" style="padding: 1vw; text-align: center;">
+        <h1 style="font-size: calc(17px + 0.7vw); font-weight: 700;">{% trans "Sign Up" %}</h1>
+      </b-col>
+    </b-row>
+    <b-card style="margin: 1vw;">
+      <b-row>
+        <b-col cols="12">
+          <p style="font-size: calc(10px + 0.5vw);">{% blocktrans %}アカウントをお持ちであれば、こちらから<a
+              href="{{ login_url }}">ログイン</a>してください。{% endblocktrans %}</p>
+        </b-col>
+        <b-col cols="12">
+          <form class="signup" method="POST" action="{% url 'account_signup' %}">
+            {% csrf_token %}
+            {% for field in form %}
+            <b-row style="width: 100%; margin: 0px;">
+              <b-col cols="12"
+                style="font-size: calc(12px + 0.5vw); display: flex; align-items: center; font-weight: 700; padding: 1vw;">
+                {{ field.label_tag }}
+              </b-col>
+              <b-col cols="12"
+                style="font-size: calc(12px + 0.3vw); padding: 1vw; border-radius: 5px; display: flex; align-items: center; margin: 0px;">
+                {{ field }}
+                {{ field.errors }}
+              </b-col>
+            </b-row>
+            {% endfor %}
+            {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+            {% endif %}
+            <b-row>
+              <b-col cols="12" style="padding: 1vw;">
+                <b-button class="primaryAction" type="submit" style="margin: 0 auto; font-size: calc(10px + 0.5vw);">
+                  {% trans "Sign Up" %}</b-button>
+              </b-col>
+            </b-row>
+          </form>
+        </b-col>
+      </b-row>
+    </b-card>
+  </b-container>
+</div>
+{% endblock %}
