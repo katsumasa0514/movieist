@@ -89,7 +89,7 @@ ENV/
 .ropeproject
 
 
-*.png
+# *.png
 *.jpg
 *.JPG
 *.jpeg
@@ -101,9 +101,6 @@ ENV/
 *.h5
 *.swp
 *.mp4
-aruco/*.pkl*
-aruco/*.csv*
-aruco/pngs
 
 *.pkl
 *.pt
