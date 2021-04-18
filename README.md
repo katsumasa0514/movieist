@@ -27,58 +27,42 @@
 このアイデアは、一つの商品から来ています。それは「ポケトーク」という翻訳機です。
 
 スマホの翻訳機能があるにもかかわらず、この商品は出荷台数が80万台を突破するヒット商品になりました。
-
 これをニュースで観た時衝撃を受け、便利な機能を抽出して使いやすくすることで、新しい商品を生み出すことができることを知りました。
 
 そして、その頃使っていた、映画.comというサイトで感じていた、映画情報サイトは映画が主体で、ユーザーの投稿は二の次であるという考えから、
-
 ユーザーの投稿を主体にすることで、投稿者の自尊心をあげ、そこから「観たい」をいち早く見つけることのできるアプリに可能性を感じ、このアプリを作成しました。
  
-## 
+## 使用技術
  
-* Python 3.6.5
-* pyxel 1.0.2
+* Python 3.8.5
+* Django 3.2
+* Mysql 8.0.23-0ubuntu0.20.04.1
+* Vue.js 
+* Bootstrap-Vue
+* Nginx
+* Gunicorn
+* AWS
+    - EC2
+    - VPC
+* TMDb API
+
+## AWS構成図
  
-Environments under [Anaconda for Windows](https://www.anaconda.com/distribution/) is tested.
- 
-```bash
-conda create -n pyxel pip python=3.6 Anaconda
-activate pyxel
-```
- 
-# Installation
- 
-Install Pyxel with pip command.
- 
-```bash
-pip install pyxel
-```
- 
-# Usage
- 
-Please create python code named "demo.py".
-And copy &amp; paste [Day4 tutorial code](https://cpp-learning.com/pyxel_physical_sim4/).
- 
-Run "demo.py"
- 
-```bash
-python demo.py
-```
- 
-# Note
- 
-I don't test environments under Linux and Mac.
- 
-# Author
- 
-* Hayabusa
-* R&D Center
-* Twitter : https://twitter.com/Cpp_Learning
- 
-# License
- 
-"Physics_Sim_Py" is under [MIT license](https://en.wikipedia.org/wiki/MIT_License).
- 
-Enjoy making cute physics simulations!
- 
-Thank you!
+## バックエンド機能一覧
+* ログイン機能（django-allauth）
+* 編集機能
+* 投稿機能(django-form)
+    - 画像アップロード機能
+* Good機能 Bad機能
+* ソート機能
+* フォロー機能
+* ページネーション機能(django.core.paginator)
+* 検索機能(TMDb API)
+* アラート機能(messages)
+
+## フロントエンド機能一覧
+* コメント開閉機能(Vue.js)
+* 星評価(vue-star-rating)
+* 写真スライド機能(vue-carousel)
+* 写真拡大機能(Bootstrap-Vue)
+* レスポンシブ機能(Bootstrap-Vue)
