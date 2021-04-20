@@ -1,0 +1,170 @@
+{% extends 'movieist/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'movieist/css/reviewer.css'%}">
+{% endblock %}
+
+{% block content %}
+<div class="main">
+    <b-container style="padding: 0 5% 0 5%">
+        <div class="page-top">
+            {% for profile in profileData %}
+            <b-row style="padding: 2vw 4vw 2vw 4vw;">
+                <b-col md="8" style=" display: flex; align-items: center; padding: 0 1vw 0 1vw;">
+                    <b-avatar src="{{ profile.userPic.url }}" size="calc(50px + 3vw)" style="float: left;"></b-avatar>
+                    <h3
+                        style="font-size: calc(15px + 0.7vw); padding-left: 15px; float: left; font-weight: 700; margin: 0px;">
+                        {{profile.user.username}}</h3>
+                </b-col>
+                <b-col md="4" style="padding: 0px;">
+                    <a href="/movieist/follower/{{profile.user_id}}"
+                        style="font-size: calc(10px + 1vw); float: left; padding: 1vw; text-align: center; color: #333;">
+                        <p style="margin: 0px; font-weight: 700;">follower</p>
+                        {{followerData}}
+                    </a>
+                    <a href="/movieist/following/{{profile.user_id}}"
+                        style="font-size: calc(10px + 1vw); float: left; padding: 1vw; text-align: center; color: #333;">
+                        <p style="margin: 0px; font-weight: 700;">following</p>
+                        {{followingData}}
+                    </a>
+                </b-col>
+                <b-col cols="12" style="padding: 0 1vw 0 1vw;">
+                    <b-card style="padding: 1vw; margin: 1vw 0 1vw 0; width: 100%;" no-body="true">
+                        <p style="font-size: calc(12px + 0.3vw)">{{profile.userComment}}</p>
+                    </b-card>
+                </b-col>
+                <b-col cols="12" style="padding: 0 1vw 0 1vw;">
+                    {% if profile.user_id != request.user.id %}
+                    <form action="{% url 'reviewer' user_id %}" method="post">
+                        {% csrf_token %}
+                        <b-button type="submit" style="font-size: calc(12px + 0.3vw)">{{follow}}</b-button>
+                    </form>
+                    {% endif %}
+                </b-col>
+            </b-row>
+
+            {% endfor %}
+        </div>
+
+        <b-row style="padding: 1vw;">
+            <h3 style="font-size: calc(20px + 0.5vw); color: #333; font-weight: 700; padding: 2vw 2vw 0 2vw;">
+                レビュー
+            </h3>
+            <b-card style="padding: 1vw; background-color: #eee; width: 100%;">
+                <b-row>
+                    {% for review in reviewDataOrg %}
+                    <b-col lg="6" style="padding: 0.5vw; height: 100%;">
+                        <b-card>
+                            <b-row>
+                                <b-col sm="4">
+                                    <b-img src="{{review.image_path}}" fluid alt="Responsive image"></b-img>
+                                </b-col>
+                                <b-col sm="8">
+                                    <b-row style="font-size: 15px; padding-top: 10px;">
+                                        <b-link href="/movieist/overview/{{review.movie_id}}"
+                                            style="color: #333; font-weight: 700;">
+                                            {{review.title}}
+                                        </b-link>
+                                    </b-row>
+                                    <b-row>
+                                        <star-rating :increment="0.5" v-model="{{review.star}}" read-only="true"
+                                            class="read-only">
+                                        </star-rating>
+                                    </b-row>
+                                    <b-row>
+                                        <b-card no-body="true" style="padding: 1vw; width: 100%;">
+                                            <h6
+                                                style="font-weight: 700; font-size: 15px; margin: 0px; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1;">
+                                                {{review.commentTitle}}
+                                            </h6>
+                                            <div v-if="toggle === {{ forloop.counter }}" cols="12"
+                                                style="font-size: 13px; text-align: center; padding: 5px 0;">
+                                                <p style="margin: 0px; text-align: left;">
+                                                    {{review.comment}}
+                                                </p>
+                                                <button v-if="toggle === {{ forloop.counter }}" @click="toggleBtn(0)"
+                                                    style="padding: 0px; border: 0px; background-color: white; font-size: calc(20px + 1vw); height: 0px;">
+                                                    <b-icon icon="chevron-compact-up" aria-hidden="true">
+                                                    </b-icon>
+                                                </button>
+                                                <button v-else @click="toggleBtn({{ forloop.counter }})"
+                                                    style="padding: 0px; border: 0px; background-color: white; font-size: calc(20px + 1vw); height: 0px;">
+                                                    <b-icon icon="chevron-compact-down" aria-hidden="true">
+                                                    </b-icon>
+                                                </button>
+                                            </div>
+                                            <div v-else cols="12"
+                                                style="font-size: 13px; text-align: center; padding: 5px 0; height: 150px;">
+                                                <p
+                                                    style="overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; text-align: left; margin: 0px;">
+                                                    {{review.comment}}
+                                                </p>
+                                                <button v-if="toggle === {{ forloop.counter }}" @click="toggleBtn(0)"
+                                                    style="padding: 0px; border: 0px; background-color: white; font-size: calc(20px + 1vw); height: 0px;">
+                                                    <b-icon icon="chevron-compact-up" aria-hidden="true">
+                                                    </b-icon>
+                                                </button>
+                                                <button v-else @click="toggleBtn({{ forloop.counter }})"
+                                                    style="padding: 0px; border: 0px; background-color: white; font-size: calc(20px + 1vw); height: 0px;">
+                                                    <b-icon icon="chevron-compact-down" aria-hidden="true">
+                                                    </b-icon>
+                                                </button>
+                                            </div>
+                                        </b-card>
+                                    </b-row>
+                                    <b-row>
+                                        <b-col cols="12" style="display: flex;">
+                                            <form search="{% url 'homepage' %}" method="post"
+                                                style="padding: 2px; text-align: right;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="id" value="{{review.id}}">
+                                                <b-button variant="outline-dark" type="submit" name="good" value="GOOD"
+                                                    style="padding: 2px 5px 2px 5px; border: 0px;">
+                                                    <b-icon icon="hand-thumbs-up" aria-hidden="true"></b-icon>
+                                                    {{review.countgood}}
+                                                </b-button>
+                                            </form>
+                                            <form search="{% url 'homepage' %}" method="post" style="padding: 2px;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="id" value="{{review.id}}">
+                                                <b-button variant="outline-dark" type="submit" name="bad" value="BAD"
+                                                    style="padding: 2px 5px 2px 5px; border: 0px;">
+                                                    <b-icon icon="hand-thumbs-down" aria-hidden="true"></b-icon>
+                                                    {{review.countbad}}
+                                                </b-button>
+                                            </form>
+                                        </b-col>
+                                    </b-row>
+                                </b-col>
+                            </b-row>
+                        </b-card>
+                    </b-col>
+                    {% endfor %}
+                </b-row>
+            </b-card>
+        </b-row>
+        <b-row align-h="center" style="padding-top: calc(20px + 2vw);">
+            <b-col cols="10">
+                <ul class="pagination">
+                    <carousel :per-page="5" :per-page-custom=[[780,10],[1024,20]] loop="true"
+                        :pagination-enabled="false" :navigation-enabled="true" navigation-prev-label="〈"
+                        navigation-next-label="〉" centerMode="true" style="width: 100%;">
+                        {% for num in page_obj.paginator.page_range %}
+                        <slide>
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><a class="page-link" href="#!"
+                                    style="text-align: center; padding: calc(1px + 0.5vw);">{{ num }}</a></li>
+                            {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}"
+                                    style="text-align: center; padding: calc(1px + 0.5vw);">{{ num }}</a></li>
+                            {% endif %}
+                        </slide>
+                        {% endfor %}
+                    </carousel>
+                </ul>
+            </b-col>
+        </b-row>
+    </b-container>
+</div>
+{% endblock %}

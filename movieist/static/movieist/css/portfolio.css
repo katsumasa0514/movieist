@@ -1,0 +1,31 @@
+.navbar-dark .navbar-nav .nav-link{
+    color: black;
+}
+
+.navbar-dark .navbar-toggler {
+    color: black;
+    border-color: black;
+}
+
+.navbar-toggler-icon {
+    border-radius: 5px;
+    font-size: 15px;
+}
+
+.header nav button {
+    border: 0px;
+    background-color: black;
+}
+
+body {
+    height: 100%;
+}
+
+@media (max-width: 1000px)
+{
+  適応させるCSS
+}
+@media (max-width: 670px)
+{
+  適応させるCSS
+}

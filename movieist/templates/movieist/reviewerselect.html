@@ -1,0 +1,46 @@
+{% extends 'movieist/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'movieist/css/reviewerselect.css'%}">
+{% endblock %}
+
+{% block content %}
+<div class="main">
+    <b-container style="padding: 0 5% 0 5%">
+        <div class="page-top">
+            <b-row align-h="end" style="padding: 1vw;">
+                <b-col cols="12" style="padding: 1vw;">
+                    <h3 style="font-size: calc(17px + 0.7vw); font-weight: 700;">ユーザーを検索 >>>
+                    </h3>
+                </b-col>
+                <b-col cols="12">
+                    <form action="{% url 'reviewerselect' %}" method="post" style="height: 100%;">
+                        {% csrf_token %}
+                        {% for field in form %}
+                        <div style="width: 100%; height: 100%;">
+                            <b-button type="submit" style="font-size: calc(10px + 0.5vw); float: right;">検索</b-button>
+                            {{ field }}
+                        </div>
+                        {% endfor %}
+                    </form>
+                </b-col>
+            </b-row>
+        </div>
+        {% if profiles %}
+        <b-card style="padding: 1vw; margin: 1vw; width: 100%;">
+            <b-row style="padding: 1vw;">
+
+                {% for profile in profiles %}
+                <b-col cols="12" sm="6" style="padding: 1vw;">
+                    <b-avatar src="{{profile.userPic.url}}" size="calc(40px + 2vw)"></b-avatar>
+                    <a href="/movieist/reviewer/{{profile.user_id}}"
+                        style="font-size: calc(10px + 0.5vw);">{{profile.user.username}}</a>
+                </b-col>
+                {% endfor %}
+            </b-row>
+        </b-card>
+        {% endif %}
+    </b-container>
+</div>
+{% endblock %}
