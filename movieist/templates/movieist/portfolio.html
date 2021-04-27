@@ -18,7 +18,7 @@
     <script src="//unpkg.com/vue@latest/dist/vue.min.js"></script>
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
-    <script src="https://cdn.rawgit.com/SSENSE/vue-carousel/6823411d/dist/vue-carousel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-scrollto"></script>
 </head>
 
 <body>
@@ -26,48 +26,194 @@
         <div class="header">
             <template>
                 <b-navbar toggleable="md" type="dark" variant="black"
-                    style="font-size: calc(9px + 0.50vw); background-color: white; opacity: 0.5; padding: 3px 10vw;">
+                    style="font-size: calc(9px + 0.50vw); background-color: rgba(128, 128, 128, 0.5); padding: 3px 10vw;">
                     <b-navbar-brand
-                        style="font-family: 'Anton', sans-serif; font-size: calc(15px + 0.5vw); padding: 0px; color: black;">
-                        Portfolio
+                        style="font-family: serif; font-size: calc(15px + 0.5vw); padding: 0px; color: black;">
+                        Katsu's Portfolio_
                     </b-navbar-brand>
                     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
                     <b-collapse id="nav-collapse" is-nav>
                         <b-navbar-nav class="ml-auto">
-                            <b-nav-item href="/movieist/">Top　|</b-nav-item>
-                            <b-nav-item href="/movieist/search/allgenre">About　|</b-nav-item>
-                            <b-nav-item href="/movieist/reviewer_ranking">Works　|</b-nav-item>
-                            <b-nav-item href="/movieist/movieselect">Contact　|</b-nav-item>
+                            <b-nav-item v-scroll-to="toTop">Top　|</b-nav-item>
+                            <b-nav-item v-scroll-to="toAbout">About　|</b-nav-item>
+                            <b-nav-item v-scroll-to="toWorks">Works　|</b-nav-item>
+                            <b-nav-item v-scroll-to="toContact">Contact　|</b-nav-item>
                         </b-navbar-nav>
                     </b-collapse>
                 </b-navbar>
             </template>
         </div>
         <div class="main">
-            <img src="/media/documents/4393732_l.jpg" style="width: 100%; height: auto; object-fit: cover;">
-            </img>
-            <b-container style="padding: 0 5% 0 5%">
-                <b-row>
-                    <b-col>
-
-                    </b-col>
-                </b-row>
-            </b-container>
+            <div class="main-container">
+                <div class="top">
+                    <transition appear name="top-title">
+                        <div class="top-title">
+                            <h1>Portfolio</h1>
+                            <p>Web Engineer_</p>
+                            <a href="#" v-scroll-to="toAbout">
+                                <b-button variant="info"
+                                    style="width: calc(70px + 3vw); font-size: calc(10px + 0.5vw); font-family: serif; padding: 7px 0;">
+                                    About me
+                                </b-button>
+                            </a>
+                        </div>
+                    </transition>
+                    <transition appear name="top-img">
+                        <img src="/media/documents/4385400_l.jpg">
+                    </transition>
+                </div>
+                <div class="about-me">
+                    <b-container>
+                        <transition name="about-me">
+                            <div v-show="about">
+                                <b-row>
+                                    <b-col cols="12" class="about-me-title">
+                                        <h1>About me_</h1>
+                                    </b-col>
+                                    <b-col cols="12" md="6" style="text-align: center; padding-bottom: 20px;">
+                                        <b-avatar src="/media/documents/4385400_l.jpg" size="calc(150px + 7vw)">
+                                        </b-avatar>
+                                    </b-col>
+                                    <b-col cols="12" md="6" class="about-me-comment">
+                                        <p>
+                                            岐阜県出身の駆け出しエンジニア。専門学校で映像技術について学び、卒業後、今しか出来ないことをしておきたいと海外留学を決意。語学勉強と多文化交流を８ヶ月間していく中で価値観が変わり、IT業界に魅了され、IT業界への就職を決意。
+                                            <br>
+                                            独学でプログラムを学び、WEBアプリを制作。その過程でバックエンド、フロントエンド、インフラ、DBと幅広く経験を積んできました。
+                                            <br>
+                                            最近では、知人の伝でプログラムのお仕事をいただき、実績も積んでいます。
+                                        </p>
+                                    </b-col>
+                                    <b-col cols="12"
+                                        style="text-align: center; height: calc(100px + 5vw); display: flex; justify-content: center; align-items: center;">
+                                        <a href="#" v-scroll-to="toWorks">
+                                            <b-button variant="dark"
+                                                style="width: calc(70px + 3vw); font-size: calc(10px + 0.5vw); font-family: serif; padding: 7px 0;">
+                                                Works
+                                            </b-button>
+                                        </a>
+                                    </b-col>
+                                </b-row>
+                            </div>
+                        </transition>
+                    </b-container>
+                </div>
+                <div class="works">
+                    <b-container>
+                        <transition name="works">
+                            <div v-show="works">
+                                <b-row class="works-title">
+                                    <h1>Works_</h1>
+                                </b-row>
+                                <b-row class="row-eq-height">
+                                    <b-col cols="12" lg="4" md="6" style="padding: 15px;">
+                                        <b-card title="Application" img-src="/media/documents/movieist.png"
+                                            img-alt="Image" img-top tag="article" style="width: 100%; height: 100%;"
+                                            class="mb-2">
+                                            <b-card-text style="font-size: calc(10px + 0.5vw);">
+                                                フロント、バック、インフラ、DBの知識を全て使い作ったWEBアプリです。詳細につきましては、下記URLをご確認ください。
+                                                <br>
+                                                <br>
+                                                <a href="http://52.196.17.172/movieist/" target="_blank"
+                                                    rel="noopener noreferrer">Application</a>
+                                                <br>
+                                                <a href="https://github.com/katsumasa0514/movieist/blob/main/README.md"
+                                                    target="_blank" rel="noopener noreferrer">README</a>
+                                            </b-card-text>
+                                        </b-card>
+                                    </b-col>
+                                    <b-col cols="12" lg="4" md="6" style="padding: 15px;">
+                                        <b-card title="Portfolio" img-src="/media/documents/portfolio.png"
+                                            img-alt="Image" img-top tag="article" style="width: 100%; height: 100%;"
+                                            class="mb-2">
+                                            <b-card-text style="font-size: calc(10px + 0.5vw);">
+                                                現在見ていただいているページです。主にVue.jsを使用しており、フロントの部分にこだわったポートフォリオになっています。
+                                                <br>
+                                                <br>
+                                                <a href="https://github.com/katsumasa0514/movieist/blob/main/movieist/templates/movieist/portfolio.html"
+                                                    target="_blank" rel="noopener noreferrer">github</a>
+                                            </b-card-text>
+                                        </b-card>
+                                    </b-col>
+                                    <b-col cols="12" lg="4" md="6" style="padding: 15px;">
+                                        <b-card title="Scraping" img-src="/media/documents/spreadseat.png"
+                                            img-alt="Image" img-top tag="article" style="width: 100%; height: 100%;"
+                                            class="mb-2">
+                                            <b-card-text style="font-size: calc(10px + 0.5vw);">
+                                                Webアプリを制作するにあたって、必要になったテストデータをスクレイピングで入手しました。Selenium、oauth2client、BeautifulSoupなどの技術を使い、入手しました。
+                                                <br>
+                                                <br>
+                                                <a href="https://github.com/katsumasa0514/movieist/blob/main/makedata_file/make_reviewdata.py"
+                                                    target="_blank" rel="noopener noreferrer">github</a>
+                                            </b-card-text>
+                                        </b-card>
+                                    </b-col>
+                                </b-row>
+                            </div>
+                        </transition>
+                    </b-container>
+                </div>
+                <div class="contact">
+                    <b-container>
+                        <b-row class="contact-title">
+                            <h1>Contact_</h1>
+                        </b-row>
+                        <div class="contact-comment">
+                            <p>
+                                サイトを閲覧いただきありがとうございました。ご用件がありましたらEmailの方からご連絡お願いします。
+                                <br>
+                                <br>
+                                Email: katumasa0514@gmail.com
+                            </p>
+                        </div>
+                        <b-row
+                            style="text-align: center; height: calc(100px + 5vw); display: flex; justify-content: center; align-items: center;">
+                            <a href="#" v-scroll-to="toTop">
+                                <b-button variant="dark"
+                                    style="width: calc(70px + 3vw); font-size: calc(10px + 0.5vw); font-family: serif; padding: 7px 0;">
+                                    to Top
+                                </b-button>
+                            </a>
+                        </b-row>
+                    </b-container>
+                </div>
+            </div>
         </div>
     </div>
 </body>
 
 <script>
+    Vue.use(VueScrollTo)
 
     app = new Vue({
         el: "#portfolio",
 
-        methods: {
-
+        data: {
+            toTop: '.main',
+            toAbout: '.about-me',
+            toWorks: '.works',
+            toContact: '.contact',
+            about: false,
+            works: false,
         },
 
-        data: {
+        created() {
+            window.addEventListener("scroll", this.handleScroll);
+        },
 
+        methods: {
+            handleScroll() {
+                this.scrollY = window.scrollY;
+                if (!this.about) {
+                    this.about = window.scrollY > 100;
+                } else if (window.scrollY < 90) {
+                    this.about = !this.about;
+                }
+                if (!this.works) {
+                    this.works = window.scrollY > 845;
+                } else if (window.scrollY < 835) {
+                    this.works = !this.works;
+                }
+            },
         },
 
     });

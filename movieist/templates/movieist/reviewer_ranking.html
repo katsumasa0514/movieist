@@ -33,16 +33,17 @@
                         <b-card no-body="true" style="height: 100%;">
                             <b-card-body>
                                 <b-row style="border: 1px black;">
-                                    <b-col cols="9" style="padding: 0 1vw;">
+                                    <b-col cols="8" style="padding: 0 1vw;">
                                         <b-avatar src="{{profile.userPic.url}}" size="calc(40px + 1vw)">
                                         </b-avatar>
                                         <b-link href="/movieist/reviewer/{{profile.user_id}}" style="padding: 1vw;">
                                             {{profile.user.username}}
                                         </b-link>
                                     </b-col>
-                                    <b-col cols="3" style="text-align: center; padding: 0 1vw;">
-                                        <span style="color: rgb(180, 180, 180); font-size: 1vw;">Followers</span>
-                                        <h6>{{ranking.countFollower}}</h6>
+                                    <b-col cols="4" style="text-align: center; padding: 0 1vw;">
+                                        <h3 style="color: rgb(180, 180, 180); font-size: 13px;">Followers
+                                        </h3>
+                                        <p style="margin: 0px;">{{ranking.countFollower}}</p>
                                     </b-col>
                                 </b-row>
                                 <b-row>

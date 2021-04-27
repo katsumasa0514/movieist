@@ -1,3 +1,23 @@
+template,
+body,
+#portfolio,
+.main,
+.main-container {
+    height: 100%;
+}
+
+/* header */
+
+.header {
+    position: fixed; 
+    width: 100%; 
+    z-index: 2;
+}
+
+.header nav button {
+    border: 0px;
+}
+
 .navbar-dark .navbar-nav .nav-link{
     color: black;
 }
@@ -12,20 +32,205 @@
     font-size: 15px;
 }
 
-.header nav button {
-    border: 0px;
-    background-color: black;
+.navbar-dark .navbar-nav .nav-link:focus {
+    color: black;
 }
 
-body {
+.navbar-dark .navbar-nav .nav-link:hover {
+    color: white;
+}
+
+/* main */
+
+/* main/top */
+
+.top-title h1 {
+    font-size: calc(30px + 3vw); 
+    font-family: serif;
+    color: white;
+    display: block;
+}
+
+.top-title p {
+    font-size: calc(15px + 1vw); 
+    font-family: serif;
+    color: white;
+    display: block;
+}
+
+.top img {
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover;
+}
+
+.top {
+    position: relative; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
     height: 100%;
 }
 
-@media (max-width: 1000px)
-{
-  適応させるCSS
+.top-title {
+    position: absolute; 
+    z-index: 1; 
+    text-align: center;
 }
-@media (max-width: 670px)
-{
-  適応させるCSS
+
+/* main/about-me */
+
+.about-me {
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    padding: 7vw 0;
+}
+
+.about-me-title {
+    height: calc(100px + 5vw);
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+.about-me-title h1 {
+    font-size: calc(15px + 2vw);
+    font-family: serif;
+    margin: 0px;
+}
+
+.about-me-comment{
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+.about-me-comment p{
+    font-size: calc(10px + 0.5vw);
+    margin: 0px;
+}
+
+/* main/works */
+
+.works {
+    background-color: #0AA2B7;
+    padding-bottom: 30px;
+}
+
+.works-title {
+    height: calc(100px + 5vw);
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+.works-title h1 {
+    font-size: calc(15px + 2vw);
+    font-family: serif;
+    margin: 0px;
+    color: white;
+}
+
+.row-eq-height {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.card-title {
+    text-align: center;
+}
+
+/* main/contact */
+
+.contact-title {
+    height: calc(100px + 5vw);
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+.contact-title h1 {
+    font-size: calc(15px + 2vw);
+    font-family: serif;
+    margin: 0px;
+    color: black;
+}
+
+.contact-comment {
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+.top-title-enter {
+    opacity: 0;
+}
+  
+.top-title-enter-active,
+.top-title-leave-active {
+    transition: opacity 3s;
+}
+  
+.top-title-enter-to {
+    opacity: 1;
+}
+  
+.top-title-leave-to {
+    opacity: 0;
+    transition: opacity 1s;
+}
+
+.top-img-enter {
+    opacity: 0;
+}
+  
+.top-img-enter-active,
+.top-img-leave-active {
+    transition: opacity 2s;
+}
+  
+.top-img-enter-to {
+    opacity: 1;
+}
+  
+.top-img-leave-to {
+    opacity: 0;
+    transition: opacity 1s;
+}
+
+.about-me-enter {
+    opacity: 0;
+}
+  
+.about-me-enter-active,
+.about-me-leave-active {
+    transition: opacity 2s;
+}
+  
+.about-me-enter-to {
+    opacity: 1;
+}
+  
+.about-me-leave-to {
+    opacity: 0;
+    transition: opacity 1s;
+}
+
+.works-enter {
+    opacity: 0;
+}
+  
+.works-enter-active,
+.works-leave-active {
+    transition: opacity 2s;
+}
+  
+.works-enter-to {
+    opacity: 1;
+}
+  
+.works-leave-to {
+    opacity: 0;
+    transition: opacity 1s;
 }
